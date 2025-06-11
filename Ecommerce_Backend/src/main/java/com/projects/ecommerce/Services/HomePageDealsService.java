@@ -1,0 +1,70 @@
+package com.projects.ecommerce.Services;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.projects.ecommerce.Entity.HomePageDeals;
+import com.projects.ecommerce.Repository.HomePageDealsRepo;
+
+
+@Service
+public class HomePageDealsService {
+    @Autowired
+    public HomePageDealsRepo homePageDealsRepo;
+
+    public HomePageDeals getDealsByDealName(String dealName) {
+        return homePageDealsRepo.findByDealName(dealName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with name: " + dealName));
+    }
+
+    public void saveDealsByDealName(HomePageDeals homePageDeals) {
+        try {
+            homePageDealsRepo.save(homePageDeals);     
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to save deal", ex);
+        }
+    }
+
+    public List<HomePageDeals> getAllDeals() {
+        try {
+            return homePageDealsRepo.findAll();
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to fetch all deals", ex);
+        }
+    }
+
+    public HomePageDeals getDealByDealId(Long dealId) {
+        return homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+    }
+
+    public void updateDealsByDealId(Long dealId, HomePageDeals homePageDeals) {
+        HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+        if(homePageDeals.getDealName() != null){
+            existingDeal.setDealName(homePageDeals.getDealName());
+        }
+        if(homePageDeals.getImageUrl() != null){
+            existingDeal.setImageUrl(homePageDeals.getImageUrl());
+        }
+        if(homePageDeals.getHeading() != null){
+            existingDeal.setHeading(homePageDeals.getHeading());
+        }
+        if(homePageDeals.getSubHeading() != null){
+            existingDeal.setSubHeading(homePageDeals.getSubHeading());
+        }
+        homePageDealsRepo.save(existingDeal);
+    }
+
+    public void deleteDealsByDealId(Long dealId) {
+        if (!homePageDealsRepo.existsById(dealId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId);
+        }
+        homePageDealsRepo.deleteById(dealId);
+    }
+
+}

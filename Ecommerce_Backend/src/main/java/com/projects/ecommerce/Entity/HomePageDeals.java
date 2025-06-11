@@ -7,18 +7,20 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "home_page_deals")
 @Getter
 @Setter
 public class HomePageDeals {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long dealId;
     @Column(nullable = false)
     String dealName;
-    String dealImageUrl1;
-    String dealImageUrl2;
-    String dealImageUrl3;
-    String dealImageUrl4;
+    @Column(nullable = false)
+    String imageUrl;
+    @Column(nullable = false)
+    String heading;
+    @Column(nullable = false)
+    String subHeading;
 }
 
