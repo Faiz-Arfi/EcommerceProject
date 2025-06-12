@@ -16,7 +16,7 @@ public class CouponsCentralService {
     @Autowired
     public CouponsCentralRepo couponsCentralRepo;
 
-    public void saveCoupon(CouponsCentral couponsCentral){
+    public CouponsCentral saveCoupon(CouponsCentral couponsCentral){
         if(couponsCentralRepo.existsByCouponCode(couponsCentral.getCouponCode())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code already exists");
         }
@@ -29,7 +29,7 @@ public class CouponsCentralService {
         else if(couponsCentral.getDescription() == null || couponsCentral.getDescription().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description cannot be null or empty");
         }
-        couponsCentralRepo.save(couponsCentral);
+        return couponsCentralRepo.save(couponsCentral);
     }
 
     public List<CouponsCentral> getAllCoupons(){
@@ -41,22 +41,12 @@ public class CouponsCentralService {
 
     }
 
-    public CouponsCentral getCouponByCouponCode(String couponCode){
-        return couponsCentralRepo.findByCouponCode(couponCode).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with code: " + couponCode));
-    }
-
-    public void updateCouponByCouponId(CouponsCentral newCoupon, Long id){
+    public CouponsCentral updateCouponByCouponId(CouponsCentral newCoupon, Long id){
         CouponsCentral existingCoupon = couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id));
 
         updateCouponByCheckingFields(existingCoupon, newCoupon);
 
-        couponsCentralRepo.save(existingCoupon);
-    }
-
-    public void updateCouponByCouponCode(CouponsCentral newCoupon, String couponCode){
-        CouponsCentral existingCoupon = couponsCentralRepo.findByCouponCode(couponCode).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with couponCode: "+ couponCode));
-
-        updateCouponByCheckingFields(existingCoupon, newCoupon);
+        return couponsCentralRepo.save(existingCoupon);
     }
 
     private void updateCouponByCheckingFields(CouponsCentral existingCoupon, CouponsCentral newCoupon){
@@ -74,12 +64,5 @@ public class CouponsCentralService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id);
         }
         couponsCentralRepo.deleteById(id);
-    }
-
-    public void deleteCouponByCouponCode(String couponCode){
-        if(!couponsCentralRepo.existsByCouponCode(couponCode)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with coupon code: "+ couponCode);
-        }
-        couponsCentralRepo.deleteByCouponCode(couponCode);
     }
 }

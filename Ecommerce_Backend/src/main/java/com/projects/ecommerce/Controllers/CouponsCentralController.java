@@ -23,8 +23,8 @@ public class CouponsCentralController {
     
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/couponcentral")
-    public void saveCoupon(@RequestBody CouponsCentral couponsCentral){
-        couponsCentralService.saveCoupon(couponsCentral);
+    public CouponsCentral saveCoupon(@RequestBody CouponsCentral couponsCentral){
+        return couponsCentralService.saveCoupon(couponsCentral);
     }
 
     @GetMapping("/couponcentral")
@@ -37,29 +37,14 @@ public class CouponsCentralController {
         return couponsCentralService.getCouponByCouponId(id);
     }
 
-    @GetMapping("/couponcentral/code/{couponCode}")
-    public CouponsCentral getCouponByCouponCode(@PathVariable String couponCode){
-        return couponsCentralService.getCouponByCouponCode(couponCode);
-    }
-
     @PutMapping("/couponcentral/id/{id}")
-    public void updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable Long id){
-        couponsCentralService.updateCouponByCouponId(coupon, id);
-    }
-
-    @PutMapping("/couponcentral/code/{couponCode}")
-    public void updateCouponByCouponCode(@RequestBody CouponsCentral coupon, @PathVariable String couponCode){
-        couponsCentralService.updateCouponByCouponCode(coupon, couponCode);
+    public CouponsCentral updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable Long id){
+        return couponsCentralService.updateCouponByCouponId(coupon, id);
     }
 
     @DeleteMapping("/couponcentral/id/{id}")
     public void deleteCouponById(@PathVariable Long id){
         couponsCentralService.deleteCouponByCouponId(id);
-    }
-
-    @DeleteMapping("/couponcentral/code/{couponCode}")
-    public void deleteCouponByCouponCode(@PathVariable String couponCode){
-        couponsCentralService.deleteCouponByCouponCode(couponCode);
     }
 
     

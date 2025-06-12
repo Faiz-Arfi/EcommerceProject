@@ -41,25 +41,16 @@ public class HomePageDealsController {
         }
     }
 
-    @GetMapping("/deals/name/{dealName}")
-    public HomePageDeals getDealsByDealName(@PathVariable String dealName){
-        try {
-            return homePageDealsService.getDealsByDealName(dealName);
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
     @PostMapping("/deals")
     @ResponseStatus(HttpStatus.CREATED)
-    public void putDeals(@RequestBody HomePageDeals homePageDeals){
-        homePageDealsService.saveDeals(homePageDeals);
+    public HomePageDeals putDeals(@RequestBody HomePageDeals homePageDeals){
+        return homePageDealsService.saveDeals(homePageDeals);
     }
 
     @PutMapping("/deals/{dealId}")
-    public void updateDeals(@PathVariable Long dealId, @RequestBody HomePageDeals newDeals){
+    public HomePageDeals updateDeals(@PathVariable Long dealId, @RequestBody HomePageDeals newDeals){
         try {
-            homePageDealsService.updateDealsByDealId(dealId, newDeals);
+            return homePageDealsService.updateDealsByDealId(dealId, newDeals);
         } catch (Exception ex) {
             throw ex;
         }

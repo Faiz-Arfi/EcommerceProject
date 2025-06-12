@@ -16,17 +16,12 @@ public class HomePageDealsService {
     @Autowired
     public HomePageDealsRepo homePageDealsRepo;
 
-    public HomePageDeals getDealsByDealName(String dealName) {
-        return homePageDealsRepo.findByDealName(dealName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with name: " + dealName));
-    }
-
-    public void saveDeals(HomePageDeals homePageDeals) {
+    public HomePageDeals saveDeals(HomePageDeals homePageDeals) {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Same deal name is already available");
         }
         try {
-            homePageDealsRepo.save(homePageDeals);     
+            return homePageDealsRepo.save(homePageDeals);     
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to save deal", ex);
         }
@@ -44,7 +39,7 @@ public class HomePageDealsService {
         return homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
     }
 
-    public void updateDealsByDealId(Long dealId, HomePageDeals homePageDeals) {
+    public HomePageDeals updateDealsByDealId(Long dealId, HomePageDeals homePageDeals) {
         HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
@@ -62,7 +57,7 @@ public class HomePageDealsService {
         if(homePageDeals.getSubHeading() != null){
             existingDeal.setSubHeading(homePageDeals.getSubHeading());
         }
-        homePageDealsRepo.save(existingDeal);
+        return homePageDealsRepo.save(existingDeal);
     }
 
     public void deleteDealsByDealId(Long dealId) {
