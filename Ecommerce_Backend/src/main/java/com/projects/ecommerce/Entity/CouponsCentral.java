@@ -1,4 +1,5 @@
 package com.projects.ecommerce.Entity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,20 +8,17 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "home_page_deals")
+@Entity(name = "coupons_central")
 @Getter
 @Setter
-public class HomePageDeals {
+public class CouponsCentral {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long dealId;
+    private Long id;
     @Column(nullable = false, unique = true)
-    String dealName;
+    private String couponCode;
     @Column(nullable = false)
-    String imageUrl;
+    private String heading;
     @Column(nullable = false)
-    String heading;
-    @Column(nullable = false)
-    String subHeading;
+    private String description;
 }
-

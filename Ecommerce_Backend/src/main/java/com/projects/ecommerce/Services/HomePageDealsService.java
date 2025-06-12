@@ -1,7 +1,6 @@
 package com.projects.ecommerce.Services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,10 @@ public class HomePageDealsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with name: " + dealName));
     }
 
-    public void saveDealsByDealName(HomePageDeals homePageDeals) {
+    public void saveDeals(HomePageDeals homePageDeals) {
+        if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Same deal name is already available");
+        }
         try {
             homePageDealsRepo.save(homePageDeals);     
         } catch (Exception ex) {
@@ -45,6 +47,9 @@ public class HomePageDealsService {
     public void updateDealsByDealId(Long dealId, HomePageDeals homePageDeals) {
         HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+        if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deal name already exists");
+        }
         if(homePageDeals.getDealName() != null){
             existingDeal.setDealName(homePageDeals.getDealName());
         }

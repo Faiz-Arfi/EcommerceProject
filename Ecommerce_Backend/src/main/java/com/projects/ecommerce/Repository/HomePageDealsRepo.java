@@ -11,4 +11,6 @@ import com.projects.ecommerce.Entity.HomePageDeals;
 @Repository
 public interface HomePageDealsRepo extends JpaRepository<HomePageDeals, Long>{
     Optional<HomePageDeals> findByDealName(String dealName);
+
+    boolean existsByDealName(String dealName);
 }

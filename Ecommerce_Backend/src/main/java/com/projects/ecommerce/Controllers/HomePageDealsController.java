@@ -53,7 +53,7 @@ public class HomePageDealsController {
     @PostMapping("/deals")
     @ResponseStatus(HttpStatus.CREATED)
     public void putDeals(@RequestBody HomePageDeals homePageDeals){
-        homePageDealsService.saveDealsByDealName(homePageDeals);
+        homePageDealsService.saveDeals(homePageDeals);
     }
 
     @PutMapping("/deals/{dealId}")
