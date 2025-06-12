@@ -22,5 +22,7 @@ public class HomePageDeals {
     String heading;
     @Column(nullable = false)
     String subHeading;
+    @Column(nullable = false)
+    String category;
 }
 

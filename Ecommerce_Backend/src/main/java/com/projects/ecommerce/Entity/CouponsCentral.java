@@ -21,4 +21,6 @@ public class CouponsCentral {
     private String heading;
     @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    private String category;
 }

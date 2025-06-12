@@ -45,17 +45,20 @@ public class HomePageDealsService {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deal name already exists");
         }
-        if(homePageDeals.getDealName() != null){
+        if(homePageDeals.getDealName() != null && !homePageDeals.getDealName().isEmpty()){
             existingDeal.setDealName(homePageDeals.getDealName());
         }
-        if(homePageDeals.getImageUrl() != null){
+        if(homePageDeals.getImageUrl() != null && !homePageDeals.getImageUrl().isEmpty()){
             existingDeal.setImageUrl(homePageDeals.getImageUrl());
         }
-        if(homePageDeals.getHeading() != null){
+        if(homePageDeals.getHeading() != null && !homePageDeals.getHeading().isEmpty()){
             existingDeal.setHeading(homePageDeals.getHeading());
         }
-        if(homePageDeals.getSubHeading() != null){
+        if(homePageDeals.getSubHeading() != null && !homePageDeals.getSubHeading().isEmpty()){
             existingDeal.setSubHeading(homePageDeals.getSubHeading());
+        }
+        if(homePageDeals.getCategory() != null && !homePageDeals.getCategory().isEmpty()){
+            existingDeal.setCategory(homePageDeals.getCategory());
         }
         return homePageDealsRepo.save(existingDeal);
     }

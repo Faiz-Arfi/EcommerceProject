@@ -29,6 +29,9 @@ public class CouponsCentralService {
         else if(couponsCentral.getDescription() == null || couponsCentral.getDescription().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description cannot be null or empty");
         }
+        else if(couponsCentral.getCategory() == null || couponsCentral.getCategory().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Catagory cannot be null or empty");
+        }
         return couponsCentralRepo.save(couponsCentral);
     }
 
@@ -50,11 +53,14 @@ public class CouponsCentralService {
     }
 
     private void updateCouponByCheckingFields(CouponsCentral existingCoupon, CouponsCentral newCoupon){
-        if(newCoupon.getDescription() != null){
+        if(newCoupon.getDescription() != null && !newCoupon.getDescription().isEmpty()){
             existingCoupon.setDescription(newCoupon.getDescription());
         }
-        if(newCoupon.getHeading() != null){
+        if(newCoupon.getHeading() != null && !newCoupon.getHeading().isEmpty()){
             existingCoupon.setHeading(newCoupon.getHeading());
+        }
+        if(newCoupon.getCategory() != null && !newCoupon.getCategory().isEmpty()){
+            existingCoupon.setCategory(newCoupon.getCategory());
         }
         couponsCentralRepo.save(existingCoupon);
     }
