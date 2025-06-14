@@ -9,7 +9,7 @@ import com.projects.ecommerce.Entity.HomePageDeals;
 
 
 @Repository
-public interface HomePageDealsRepo extends JpaRepository<HomePageDeals, Long>{
+public interface HomePageDealsRepo extends JpaRepository<HomePageDeals, String>{
     Optional<HomePageDeals> findByDealName(String dealName);
 
     boolean existsByDealName(String dealName);

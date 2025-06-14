@@ -35,11 +35,11 @@ public class HomePageDealsService {
         }
     }
 
-    public HomePageDeals getDealByDealId(Long dealId) {
+    public HomePageDeals getDealByDealId(String dealId) {
         return homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
     }
 
-    public HomePageDeals updateDealsByDealId(Long dealId, HomePageDeals homePageDeals) {
+    public HomePageDeals updateDealsByDealId(String dealId, HomePageDeals homePageDeals) {
         HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
@@ -63,7 +63,7 @@ public class HomePageDealsService {
         return homePageDealsRepo.save(existingDeal);
     }
 
-    public void deleteDealsByDealId(Long dealId) {
+    public void deleteDealsByDealId(String dealId) {
         if (!homePageDealsRepo.existsById(dealId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId);
         }

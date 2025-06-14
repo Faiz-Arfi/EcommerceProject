@@ -39,12 +39,12 @@ public class CouponsCentralService {
         return couponsCentralRepo.findAll();
     }
 
-    public CouponsCentral getCouponByCouponId(Long id){
+    public CouponsCentral getCouponByCouponId(String id){
         return couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+id));
 
     }
 
-    public CouponsCentral updateCouponByCouponId(CouponsCentral newCoupon, Long id){
+    public CouponsCentral updateCouponByCouponId(CouponsCentral newCoupon, String id){
         CouponsCentral existingCoupon = couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id));
 
         updateCouponByCheckingFields(existingCoupon, newCoupon);
@@ -65,7 +65,7 @@ public class CouponsCentralService {
         couponsCentralRepo.save(existingCoupon);
     }
 
-    public void deleteCouponByCouponId(Long id){
+    public void deleteCouponByCouponId(String id){
         if(!couponsCentralRepo.existsById(id)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id);
         }

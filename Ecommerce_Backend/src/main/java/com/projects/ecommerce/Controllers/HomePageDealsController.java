@@ -33,7 +33,7 @@ public class HomePageDealsController {
     }
 
     @GetMapping("/deals/id/{dealId}")
-    public HomePageDeals getDealsByDealId(@PathVariable Long dealId){
+    public HomePageDeals getDealsByDealId(@PathVariable String dealId){
         try {
             return homePageDealsService.getDealByDealId(dealId);
         } catch (ResponseStatusException ex) {
@@ -48,7 +48,7 @@ public class HomePageDealsController {
     }
 
     @PutMapping("/deals/{dealId}")
-    public HomePageDeals updateDeals(@PathVariable Long dealId, @RequestBody HomePageDeals newDeals){
+    public HomePageDeals updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
         try {
             return homePageDealsService.updateDealsByDealId(dealId, newDeals);
         } catch (Exception ex) {
@@ -57,7 +57,7 @@ public class HomePageDealsController {
     }
 
     @DeleteMapping("/deals/{dealId}")
-    public void deleteDeals(@PathVariable Long dealId){
+    public void deleteDeals(@PathVariable String dealId){
         try {
             homePageDealsService.deleteDealsByDealId(dealId);
         } catch (Exception ex) {

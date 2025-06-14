@@ -1,9 +1,10 @@
 package com.projects.ecommerce.Entity;
 
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +14,9 @@ import lombok.Setter;
 @Setter
 public class CouponsCentral {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue
+    @UuidGenerator
+    private String couponId;
     @Column(nullable = false, unique = true)
     private String couponCode;
     @Column(nullable = false)
