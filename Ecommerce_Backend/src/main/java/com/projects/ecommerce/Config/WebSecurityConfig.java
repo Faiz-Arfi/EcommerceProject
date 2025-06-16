@@ -17,9 +17,10 @@ public class WebSecurityConfig{
         httpSecurity
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(request -> request
-                .requestMatchers("/users","/users/**").authenticated()
+                // .requestMatchers("/users","/users/**").authenticated()
                 .anyRequest().permitAll()
             )
+            .formLogin(Customizer.withDefaults())
             .httpBasic(Customizer.withDefaults());
         return httpSecurity.build();
     }

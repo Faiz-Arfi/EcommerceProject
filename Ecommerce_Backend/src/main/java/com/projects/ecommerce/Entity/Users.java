@@ -28,6 +28,7 @@ public class Users {
     private String UserId;
 
     @Column(nullable = false)
+    @NotNull(message = "FirstName cannot be null")
     private String firstName;
     
     private String lastName;
@@ -36,7 +37,8 @@ public class Users {
     @NotNull(message = "Email cannot be null")
     private String email;
     
-    @Column(nullable = false, length = 8)
+    @Column(nullable = false)
+    @NotNull(message = "Password cannot be null")
     private String password;
 
     @OneToMany(mappedBy = "user")

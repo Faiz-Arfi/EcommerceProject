@@ -8,4 +8,8 @@ import com.projects.ecommerce.Entity.Users;
 @Repository
 public interface UsersRepo extends JpaRepository<Users, String>{
 
+    boolean existsByEmail(String email);
+
+    Users findByEmail(String email);
+
 }
