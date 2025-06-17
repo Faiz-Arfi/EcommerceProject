@@ -36,6 +36,12 @@ public class UsersService {
         else if(user.getPassword() == null || user.getPassword().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty");
         }
+        else if(user.getPassword().length() < 8){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 8 characters long");
+        }
+        else if(!user.getPassword().matches("((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20})")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+        }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return usersRepo.save(user);
     }
