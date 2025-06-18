@@ -50,6 +50,7 @@ public class EntityDTOMapper {
                 homePageDeals.getCategory()
         );
     }
+    
     public List<HomePageDealsDTO> toHomePageDealsDTOList(List<HomePageDeals> homePageDealsList){
         if(homePageDealsList == null || homePageDealsList.isEmpty()){
             return new ArrayList<>();
