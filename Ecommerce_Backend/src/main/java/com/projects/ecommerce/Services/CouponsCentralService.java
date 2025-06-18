@@ -9,8 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.CouponsCentral;
+import com.projects.ecommerce.Entity.Users;
 import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import com.projects.ecommerce.Repository.CouponsCentralRepo;
+import com.projects.ecommerce.Repository.UsersRepo;
 
 @Service
 public class CouponsCentralService {
@@ -18,19 +20,21 @@ public class CouponsCentralService {
     @Autowired
     private CouponsCentralRepo couponsCentralRepo;
     @Autowired
+    private UsersRepo usersRepo;
+    @Autowired
     private EntityDTOMapper entityDTOMapper;
 
     public CouponsCentralDTO saveCoupon(CouponsCentral couponsCentral){
         if(couponsCentralRepo.existsByCouponCode(couponsCentral.getCouponCode())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code already exists");
         }
-        if(couponsCentral.getCouponCode() == null || couponsCentral.getCouponCode().isEmpty()) {
+        if(couponsCentral.getCouponCode() == null || couponsCentral.getCouponCode().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code cannot be null or empty");
         }
-        else if(couponsCentral.getHeading() == null || couponsCentral.getHeading().isEmpty()) {
+        else if(couponsCentral.getHeading() == null || couponsCentral.getHeading().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Heading cannot be null or empty");
         }
-        else if(couponsCentral.getDescription() == null || couponsCentral.getDescription().isEmpty()) {
+        else if(couponsCentral.getDescription() == null || couponsCentral.getDescription().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description cannot be null or empty");
         }
         else if(couponsCentral.getCategory() == null || couponsCentral.getCategory().isEmpty()){
@@ -52,9 +56,18 @@ public class CouponsCentralService {
     public CouponsCentralDTO updateCouponByCouponId(CouponsCentral newCoupon, String id){
         CouponsCentral existingCoupon = couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id));
 
-        updateCouponByCheckingFields(existingCoupon, newCoupon);
+        Users user = newCoupon.getUser();
+        if(user != null && user.getUserId().isEmpty() && !usersRepo.existsById(user.getUserId())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with the id: " + user.getUserId());
+        }
 
-        return entityDTOMapper.toCouponsCentralDTO(couponsCentralRepo.save(existingCoupon));
+
+        updateCouponByCheckingFields(existingCoupon, newCoupon);
+        try {
+            return entityDTOMapper.toCouponsCentralDTO(couponsCentralRepo.save(existingCoupon));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to save coupon: " , e);
+        }
     }
 
     private void updateCouponByCheckingFields(CouponsCentral existingCoupon, CouponsCentral newCoupon){

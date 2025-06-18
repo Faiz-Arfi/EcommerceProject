@@ -9,8 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.HomePageDeals;
+import com.projects.ecommerce.Entity.Users;
 import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Repository.HomePageDealsRepo;
+import com.projects.ecommerce.Repository.UsersRepo;
 
 
 @Service
@@ -18,15 +20,39 @@ public class HomePageDealsService {
     @Autowired
     private HomePageDealsRepo homePageDealsRepo;
     @Autowired
+    private UsersRepo usersRepo;
+    @Autowired
     private EntityDTOMapper entityDTOMapper;
 
     public HomePageDealsDTO saveDeals(HomePageDeals homePageDeals) {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Same deal name is already available");
         }
+        Users user = homePageDeals.getUser();
+        if(user != null &&
+            user.getUserId() != null &&
+            !user.getUserId().isEmpty() &&
+            !usersRepo.existsById(user.getUserId())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user present with the id: " + user.getUserId());
+        }
+        if(homePageDeals.getDealName() == null || homePageDeals.getDealName().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deal name cannot be null or empty");
+        } 
+        else if(homePageDeals.getImageUrl() == null || homePageDeals.getImageUrl().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image URL cannot be null or empty");
+        }
+        else if(homePageDeals.getHeading() == null || homePageDeals.getHeading().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Heading cannot be null or empty");
+        }
+        else if(homePageDeals.getSubHeading() == null || homePageDeals.getSubHeading().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subheading cannot be null or empty");
+        }
+        else if(homePageDeals.getCategory() == null || homePageDeals.getCategory().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category cannot be null or empty");
+        }
         try {
             return entityDTOMapper.toHomePageDealsDTO(homePageDealsRepo.save(homePageDeals));    
-        } catch (Exception ex) {
+        } catch (ResponseStatusException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to save deal", ex);
         }
     }
@@ -44,7 +70,11 @@ public class HomePageDealsService {
 
     public HomePageDealsDTO getDealByDealId(String dealId) {
         HomePageDeals homePageDeals = homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
-        return entityDTOMapper.toHomePageDealsDTO(homePageDeals);
+        try {
+            return entityDTOMapper.toHomePageDealsDTO(homePageDeals);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to get the deal");
+        }
     }
 
     public HomePageDealsDTO updateDealsByDealId(String dealId, HomePageDeals homePageDeals) {

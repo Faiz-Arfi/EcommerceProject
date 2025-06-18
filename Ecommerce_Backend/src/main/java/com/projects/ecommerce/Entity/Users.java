@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,9 +42,9 @@ public class Users {
     @NotNull(message = "Password cannot be null")
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CouponsCentral> couponsCentrals;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<HomePageDeals> homePageDeals;
 
 }
