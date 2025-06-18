@@ -88,4 +88,9 @@ public class CouponsCentralService {
         }
         couponsCentralRepo.deleteById(id);
     }
+
+    public List<CouponsCentralDTO> getCouponsByUserId(String userId) {
+        Users user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+        return entityDTOMapper.toCouponsCentralDTOList(user.getCouponsCentrals());
+    }
 }

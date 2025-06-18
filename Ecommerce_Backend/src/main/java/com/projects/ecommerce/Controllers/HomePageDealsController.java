@@ -29,7 +29,7 @@ public class HomePageDealsController {
         try {
             return homePageDealsService.getAllDeals();
         } catch (ResponseStatusException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw ex;
         }
     }
 
@@ -45,14 +45,18 @@ public class HomePageDealsController {
     @PostMapping("/deals")
     @ResponseStatus(HttpStatus.CREATED)
     public HomePageDealsDTO putDeals(@RequestBody HomePageDeals homePageDeals){
-        return homePageDealsService.saveDeals(homePageDeals);
+        try {
+            return homePageDealsService.saveDeals(homePageDeals);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     @PutMapping("/deals/{dealId}")
     public HomePageDealsDTO updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
         try {
             return homePageDealsService.updateDealsByDealId(dealId, newDeals);
-        } catch (Exception ex) {
+        } catch (ResponseStatusException ex) {
             throw ex;
         }
     }
@@ -61,8 +65,17 @@ public class HomePageDealsController {
     public void deleteDeals(@PathVariable String dealId){
         try {
             homePageDealsService.deleteDealsByDealId(dealId);
-        } catch (Exception ex) {
+        } catch (ResponseStatusException ex) {
             throw ex;
         }
+    }
+
+    @GetMapping("/deals/user/{userId}")
+    public List<HomePageDealsDTO> getDealsByUserId(@PathVariable String userId){
+        try {
+            return homePageDealsService.getDealsByUserId(userId);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        } 
     }
 }

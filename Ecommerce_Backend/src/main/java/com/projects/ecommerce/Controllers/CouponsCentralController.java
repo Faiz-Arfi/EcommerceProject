@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.Services.CouponsCentralService;
 import com.projects.ecommerce.Entity.CouponsCentral;
@@ -25,27 +26,56 @@ public class CouponsCentralController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/couponcentral")
     public CouponsCentralDTO saveCoupon(@RequestBody CouponsCentral couponsCentral){
-        return couponsCentralService.saveCoupon(couponsCentral);
+        try {
+            return couponsCentralService.saveCoupon(couponsCentral);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     @GetMapping("/couponcentral")
     public List<CouponsCentralDTO> getAllCoupons(){
-        return couponsCentralService.getAllCoupons();
+        try {
+            return couponsCentralService.getAllCoupons();
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     @GetMapping("/couponcentral/id/{id}")
     public CouponsCentralDTO getCouponById(@PathVariable String id){
-        return couponsCentralService.getCouponByCouponId(id);
+        try {
+            return couponsCentralService.getCouponByCouponId(id);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     @PutMapping("/couponcentral/id/{id}")
     public CouponsCentralDTO updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable String id){
-        return couponsCentralService.updateCouponByCouponId(coupon, id);
+        try {
+            return couponsCentralService.updateCouponByCouponId(coupon, id);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     @DeleteMapping("/couponcentral/id/{id}")
     public void deleteCouponById(@PathVariable String id){
-        couponsCentralService.deleteCouponByCouponId(id);
+        try {
+            couponsCentralService.deleteCouponByCouponId(id);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
+    }
+
+    @GetMapping("/couponcentral/user/{userId}")
+    public List<CouponsCentralDTO> getCouponsByUserId(@PathVariable String userId){
+        try {
+            return couponsCentralService.getCouponsByUserId(userId);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        }
     }
 
     

@@ -113,4 +113,9 @@ public class HomePageDealsService {
         homePageDealsRepo.deleteById(dealId);
     }
 
+    public List<HomePageDealsDTO> getDealsByUserId(String userId) {
+        Users user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+        return entityDTOMapper.toHomePageDealsDTOList(user.getHomePageDeals());
+    }
+
 }
