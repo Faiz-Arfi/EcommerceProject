@@ -23,9 +23,9 @@ public class EntityDTOMapper {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
-        dto.setPassword(null);
+        dto.setPassword(user.getPassword());
         dto.setHomePageDeals(toHomePageDealsDTOList(user.getHomePageDeals()));
-        // dto.setCouponsCentrals(user.getCouponsCentrals());
+        dto.setCouponsCentrals(toCouponsCentralDTOList(user.getCouponsCentrals()));
         return dto;
     }
     public List<UsersDTO> toUsersDTOList(List<Users> userList){
@@ -66,7 +66,7 @@ public class EntityDTOMapper {
         return new CouponsCentralDTO(
             couponsCentral.getCouponId(),
             couponsCentral.getCouponCode(),
-            couponsCentral.getDescription(),
+            couponsCentral.getHeading(),
             couponsCentral.getDescription(),
             couponsCentral.getCategory()
         );

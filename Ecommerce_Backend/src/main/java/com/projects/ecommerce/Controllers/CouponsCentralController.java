@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projects.ecommerce.Services.CouponsCentralService;
 import com.projects.ecommerce.Entity.CouponsCentral;
+import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 
 @RestController
 public class CouponsCentralController {
@@ -23,22 +24,22 @@ public class CouponsCentralController {
     
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/couponcentral")
-    public CouponsCentral saveCoupon(@RequestBody CouponsCentral couponsCentral){
+    public CouponsCentralDTO saveCoupon(@RequestBody CouponsCentral couponsCentral){
         return couponsCentralService.saveCoupon(couponsCentral);
     }
 
     @GetMapping("/couponcentral")
-    public List<CouponsCentral> getAllCoupons(){
+    public List<CouponsCentralDTO> getAllCoupons(){
         return couponsCentralService.getAllCoupons();
     }
 
     @GetMapping("/couponcentral/id/{id}")
-    public CouponsCentral getCouponById(@PathVariable String id){
+    public CouponsCentralDTO getCouponById(@PathVariable String id){
         return couponsCentralService.getCouponByCouponId(id);
     }
 
     @PutMapping("/couponcentral/id/{id}")
-    public CouponsCentral updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable String id){
+    public CouponsCentralDTO updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable String id){
         return couponsCentralService.updateCouponByCouponId(coupon, id);
     }
 

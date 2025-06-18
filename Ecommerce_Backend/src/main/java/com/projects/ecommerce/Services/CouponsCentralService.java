@@ -7,16 +7,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.CouponsCentral;
+import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import com.projects.ecommerce.Repository.CouponsCentralRepo;
 
 @Service
 public class CouponsCentralService {
 
     @Autowired
-    public CouponsCentralRepo couponsCentralRepo;
+    private CouponsCentralRepo couponsCentralRepo;
+    @Autowired
+    private EntityDTOMapper entityDTOMapper;
 
-    public CouponsCentral saveCoupon(CouponsCentral couponsCentral){
+    public CouponsCentralDTO saveCoupon(CouponsCentral couponsCentral){
         if(couponsCentralRepo.existsByCouponCode(couponsCentral.getCouponCode())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code already exists");
         }
@@ -32,24 +36,25 @@ public class CouponsCentralService {
         else if(couponsCentral.getCategory() == null || couponsCentral.getCategory().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Catagory cannot be null or empty");
         }
-        return couponsCentralRepo.save(couponsCentral);
+        return entityDTOMapper.toCouponsCentralDTO(couponsCentralRepo.save(couponsCentral));
     }
 
-    public List<CouponsCentral> getAllCoupons(){
-        return couponsCentralRepo.findAll();
+    public List<CouponsCentralDTO> getAllCoupons(){
+        return entityDTOMapper.toCouponsCentralDTOList(couponsCentralRepo.findAll());
     }
 
-    public CouponsCentral getCouponByCouponId(String id){
-        return couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+id));
+    public CouponsCentralDTO getCouponByCouponId(String id){
+        CouponsCentral couponsCentral=  couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+id));
+        return entityDTOMapper.toCouponsCentralDTO(couponsCentral);
 
     }
 
-    public CouponsCentral updateCouponByCouponId(CouponsCentral newCoupon, String id){
+    public CouponsCentralDTO updateCouponByCouponId(CouponsCentral newCoupon, String id){
         CouponsCentral existingCoupon = couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id));
 
         updateCouponByCheckingFields(existingCoupon, newCoupon);
 
-        return couponsCentralRepo.save(existingCoupon);
+        return entityDTOMapper.toCouponsCentralDTO(couponsCentralRepo.save(existingCoupon));
     }
 
     private void updateCouponByCheckingFields(CouponsCentral existingCoupon, CouponsCentral newCoupon){
@@ -62,7 +67,6 @@ public class CouponsCentralService {
         if(newCoupon.getCategory() != null && !newCoupon.getCategory().isEmpty()){
             existingCoupon.setCategory(newCoupon.getCategory());
         }
-        couponsCentralRepo.save(existingCoupon);
     }
 
     public void deleteCouponByCouponId(String id){

@@ -1,5 +1,6 @@
 package com.projects.ecommerce.Services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,39 +8,47 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.HomePageDeals;
+import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Repository.HomePageDealsRepo;
 
 
 @Service
 public class HomePageDealsService {
     @Autowired
-    public HomePageDealsRepo homePageDealsRepo;
+    private HomePageDealsRepo homePageDealsRepo;
+    @Autowired
+    private EntityDTOMapper entityDTOMapper;
 
-    public HomePageDeals saveDeals(HomePageDeals homePageDeals) {
+    public HomePageDealsDTO saveDeals(HomePageDeals homePageDeals) {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Same deal name is already available");
         }
         try {
-            return homePageDealsRepo.save(homePageDeals);     
+            return entityDTOMapper.toHomePageDealsDTO(homePageDealsRepo.save(homePageDeals));    
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to save deal", ex);
         }
     }
 
-    public List<HomePageDeals> getAllDeals() {
+    public List<HomePageDealsDTO> getAllDeals() {
         try {
-            return homePageDealsRepo.findAll();
+            List<HomePageDeals> homePageDealsList = homePageDealsRepo.findAll();
+            //convert to DTO and return
+            return entityDTOMapper.toHomePageDealsDTOList(homePageDealsList);
+
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to fetch all deals", ex);
         }
     }
 
-    public HomePageDeals getDealByDealId(String dealId) {
-        return homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+    public HomePageDealsDTO getDealByDealId(String dealId) {
+        HomePageDeals homePageDeals = homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+        return entityDTOMapper.toHomePageDealsDTO(homePageDeals);
     }
 
-    public HomePageDeals updateDealsByDealId(String dealId, HomePageDeals homePageDeals) {
+    public HomePageDealsDTO updateDealsByDealId(String dealId, HomePageDeals homePageDeals) {
         HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
@@ -60,7 +69,12 @@ public class HomePageDealsService {
         if(homePageDeals.getCategory() != null && !homePageDeals.getCategory().isEmpty()){
             existingDeal.setCategory(homePageDeals.getCategory());
         }
-        return homePageDealsRepo.save(existingDeal);
+        
+        try {
+            return entityDTOMapper.toHomePageDealsDTO(homePageDealsRepo.save(existingDeal));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to update deal", e);
+        }
     }
 
     public void deleteDealsByDealId(String dealId) {

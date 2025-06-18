@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import com.projects.ecommerce.Entity.HomePageDeals;
+import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Services.HomePageDealsService;
 
 
@@ -24,7 +25,7 @@ public class HomePageDealsController {
     public HomePageDealsService homePageDealsService;
 
     @GetMapping("/deals")
-    public List<HomePageDeals> getAllDeals(){
+    public List<HomePageDealsDTO> getAllDeals(){
         try {
             return homePageDealsService.getAllDeals();
         } catch (ResponseStatusException ex) {
@@ -33,7 +34,7 @@ public class HomePageDealsController {
     }
 
     @GetMapping("/deals/id/{dealId}")
-    public HomePageDeals getDealsByDealId(@PathVariable String dealId){
+    public HomePageDealsDTO getDealsByDealId(@PathVariable String dealId){
         try {
             return homePageDealsService.getDealByDealId(dealId);
         } catch (ResponseStatusException ex) {
@@ -43,12 +44,12 @@ public class HomePageDealsController {
 
     @PostMapping("/deals")
     @ResponseStatus(HttpStatus.CREATED)
-    public HomePageDeals putDeals(@RequestBody HomePageDeals homePageDeals){
+    public HomePageDealsDTO putDeals(@RequestBody HomePageDeals homePageDeals){
         return homePageDealsService.saveDeals(homePageDeals);
     }
 
     @PutMapping("/deals/{dealId}")
-    public HomePageDeals updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
+    public HomePageDealsDTO updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
         try {
             return homePageDealsService.updateDealsByDealId(dealId, newDeals);
         } catch (Exception ex) {

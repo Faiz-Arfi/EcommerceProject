@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projects.ecommerce.Entity.Users;
+import com.projects.ecommerce.Entity.DTO.UsersDTO;
 import com.projects.ecommerce.Services.UsersService;
 
 @RestController
@@ -21,7 +22,7 @@ public class UsersController {
     private UsersService usersService;
 
     @PostMapping("/users/dummyusers")
-    public List<Users> addDummyUsers(){
+    public List<UsersDTO> addDummyUsers(){
         List<Users> userList = new ArrayList<>();
         Users user1 = new Users(null, "Kishore", "Kumar", "kishorekumar1@mail.com", "12345678", null, null);
         Users user2 = new Users(null, "Kishore", "Kumar", "kishorekumar2@mail.com", "12345678", null, null);
@@ -41,17 +42,17 @@ public class UsersController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Users registerUser(@RequestBody Users user){
+    public UsersDTO registerUser(@RequestBody Users user){
         return usersService.saveUser(user);
     }
 
     @GetMapping("/users")
-    public List<Users> getAllUsers(){
+    public List<UsersDTO> getAllUsers(){
         return usersService.getAllUsers();
     }
 
     @GetMapping("/users/{userId}")
-    public Users getUserById(@PathVariable String userId) {
+    public UsersDTO getUserById(@PathVariable String userId) {
         System.out.println("User ID: " + userId);
         return usersService.getUserById(userId);
     }

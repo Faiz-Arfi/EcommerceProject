@@ -8,7 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.Users;
+import com.projects.ecommerce.Entity.DTO.UsersDTO;
 import com.projects.ecommerce.Repository.UsersRepo;
 
 @Service
@@ -18,12 +20,14 @@ public class UsersService {
     private UsersRepo usersRepo;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private EntityDTOMapper entityDTOMapper;
 
-    public List<Users> saveAllUsers(List<Users> userList) {
-        return usersRepo.saveAll(userList);
+    public List<UsersDTO> saveAllUsers(List<Users> userList) {
+        return entityDTOMapper.toUsersDTOList(usersRepo.saveAll(userList));
     }
 
-    public Users saveUser(Users user) {
+    public UsersDTO saveUser(Users user) {
         if(usersRepo.existsByEmail(user.getEmail())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user already exists with the same email");
         }
@@ -43,16 +47,17 @@ public class UsersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return usersRepo.save(user);
+        return entityDTOMapper.toUserDTO(usersRepo.save(user));
     }
 
-    public List<Users> getAllUsers() {
-        return usersRepo.findAll();
+    public List<UsersDTO> getAllUsers() {
+        return entityDTOMapper.toUsersDTOList(usersRepo.findAll());
     }
 
-    public Users getUserById(String userId) {
-        return usersRepo.findById(userId)
+    public UsersDTO getUserById(String userId) {
+        Users user = usersRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+        return entityDTOMapper.toUserDTO(user);
     }
 
 }
