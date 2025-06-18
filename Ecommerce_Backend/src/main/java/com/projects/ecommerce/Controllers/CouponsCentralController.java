@@ -36,7 +36,7 @@ public class CouponsCentralController {
     @GetMapping("/couponcentral")
     public List<CouponsCentralDTO> getAllCoupons(){
         try {
-            return couponsCentralService.getAllCoupons();
+            return couponsCentralService.getAllCouponsDTO();
         } catch (ResponseStatusException ex) {
             throw ex;
         }
@@ -45,7 +45,7 @@ public class CouponsCentralController {
     @GetMapping("/couponcentral/id/{id}")
     public CouponsCentralDTO getCouponById(@PathVariable String id){
         try {
-            return couponsCentralService.getCouponByCouponId(id);
+            return couponsCentralService.getCouponDTOByCouponId(id);
         } catch (ResponseStatusException ex) {
             throw ex;
         }
@@ -68,15 +68,5 @@ public class CouponsCentralController {
             throw ex;
         }
     }
-
-    @GetMapping("/couponcentral/user/{userId}")
-    public List<CouponsCentralDTO> getCouponsByUserId(@PathVariable String userId){
-        try {
-            return couponsCentralService.getCouponsByUserId(userId);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
-    }
-
     
 }

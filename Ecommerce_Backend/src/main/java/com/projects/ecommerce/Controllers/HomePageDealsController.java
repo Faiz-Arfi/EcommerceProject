@@ -27,7 +27,7 @@ public class HomePageDealsController {
     @GetMapping("/deals")
     public List<HomePageDealsDTO> getAllDeals(){
         try {
-            return homePageDealsService.getAllDeals();
+            return homePageDealsService.getAllDealsDTO();
         } catch (ResponseStatusException ex) {
             throw ex;
         }
@@ -36,7 +36,7 @@ public class HomePageDealsController {
     @GetMapping("/deals/id/{dealId}")
     public HomePageDealsDTO getDealsByDealId(@PathVariable String dealId){
         try {
-            return homePageDealsService.getDealByDealId(dealId);
+            return homePageDealsService.getDealDTOByDealId(dealId);
         } catch (ResponseStatusException ex) {
             throw ex;
         }
@@ -70,12 +70,4 @@ public class HomePageDealsController {
         }
     }
 
-    @GetMapping("/deals/user/{userId}")
-    public List<HomePageDealsDTO> getDealsByUserId(@PathVariable String userId){
-        try {
-            return homePageDealsService.getDealsByUserId(userId);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        } 
-    }
 }
