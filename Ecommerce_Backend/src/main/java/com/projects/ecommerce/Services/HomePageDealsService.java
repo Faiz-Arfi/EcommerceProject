@@ -9,10 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.HomePageDeals;
-import com.projects.ecommerce.Entity.Users;
 import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Repository.HomePageDealsRepo;
-import com.projects.ecommerce.Repository.UsersRepo;
 
 
 @Service
@@ -20,20 +18,11 @@ public class HomePageDealsService {
     @Autowired
     private HomePageDealsRepo homePageDealsRepo;
     @Autowired
-    private UsersRepo usersRepo;
-    @Autowired
     private EntityDTOMapper entityDTOMapper;
 
     public HomePageDealsDTO saveDeals(HomePageDeals homePageDeals) {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Same deal name is already available");
-        }
-        Users user = homePageDeals.getUser();
-        if(user != null &&
-            user.getUserId() != null &&
-            !user.getUserId().isEmpty() &&
-            !usersRepo.existsById(user.getUserId())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user present with the id: " + user.getUserId());
         }
         if(homePageDeals.getDealName() == null || homePageDeals.getDealName().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deal name cannot be null or empty");
@@ -57,9 +46,12 @@ public class HomePageDealsService {
         }
     }
 
-    public List<HomePageDealsDTO> getAllDeals() {
+    public List<HomePageDeals> getAllDeals(){
+        return homePageDealsRepo.findAll();
+    }
+    public List<HomePageDealsDTO> getAllDealsDTO() {
         try {
-            List<HomePageDeals> homePageDealsList = homePageDealsRepo.findAll();
+            List<HomePageDeals> homePageDealsList = getAllDeals();
             //convert to DTO and return
             return entityDTOMapper.toHomePageDealsDTOList(homePageDealsList);
 
@@ -68,8 +60,12 @@ public class HomePageDealsService {
         }
     }
 
-    public HomePageDealsDTO getDealByDealId(String dealId) {
-        HomePageDeals homePageDeals = homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+    public HomePageDeals getDealbyDealId(String dealId){
+        return homePageDealsRepo.findById(dealId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+    }
+
+    public HomePageDealsDTO getDealDTOByDealId(String dealId) {
+        HomePageDeals homePageDeals = getDealbyDealId(dealId);
         try {
             return entityDTOMapper.toHomePageDealsDTO(homePageDeals);
         } catch (Exception e) {
@@ -78,8 +74,7 @@ public class HomePageDealsService {
     }
 
     public HomePageDealsDTO updateDealsByDealId(String dealId, HomePageDeals homePageDeals) {
-        HomePageDeals existingDeal = homePageDealsRepo.findById(dealId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId));
+        HomePageDeals existingDeal = getDealbyDealId(dealId);
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deal name already exists");
         }
@@ -111,11 +106,6 @@ public class HomePageDealsService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Deal not found with id: " + dealId);
         }
         homePageDealsRepo.deleteById(dealId);
-    }
-
-    public List<HomePageDealsDTO> getDealsByUserId(String userId) {
-        Users user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
-        return entityDTOMapper.toHomePageDealsDTOList(user.getHomePageDeals());
     }
 
 }

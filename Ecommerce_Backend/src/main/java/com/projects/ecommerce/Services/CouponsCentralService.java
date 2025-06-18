@@ -9,18 +9,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
 import com.projects.ecommerce.Entity.CouponsCentral;
-import com.projects.ecommerce.Entity.Users;
 import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import com.projects.ecommerce.Repository.CouponsCentralRepo;
-import com.projects.ecommerce.Repository.UsersRepo;
 
 @Service
 public class CouponsCentralService {
 
     @Autowired
     private CouponsCentralRepo couponsCentralRepo;
-    @Autowired
-    private UsersRepo usersRepo;
     @Autowired
     private EntityDTOMapper entityDTOMapper;
 
@@ -43,24 +39,25 @@ public class CouponsCentralService {
         return entityDTOMapper.toCouponsCentralDTO(couponsCentralRepo.save(couponsCentral));
     }
 
-    public List<CouponsCentralDTO> getAllCoupons(){
-        return entityDTOMapper.toCouponsCentralDTOList(couponsCentralRepo.findAll());
+    public List<CouponsCentral> getAllCoupons(){
+        return couponsCentralRepo.findAll();
+    
+    }
+    public List<CouponsCentralDTO> getAllCouponsDTO(){
+        return entityDTOMapper.toCouponsCentralDTOList(getAllCoupons());
     }
 
-    public CouponsCentralDTO getCouponByCouponId(String id){
-        CouponsCentral couponsCentral=  couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+id));
-        return entityDTOMapper.toCouponsCentralDTO(couponsCentral);
+    public CouponsCentral getCouponByCouponCodeId(String id){
+        return couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+id));
+    }
 
+    public CouponsCentralDTO getCouponDTOByCouponId(String id){
+        CouponsCentral couponsCentral=  getCouponByCouponCodeId(id);
+        return entityDTOMapper.toCouponsCentralDTO(couponsCentral);
     }
 
     public CouponsCentralDTO updateCouponByCouponId(CouponsCentral newCoupon, String id){
-        CouponsCentral existingCoupon = couponsCentralRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id));
-
-        Users user = newCoupon.getUser();
-        if(user != null && user.getUserId().isEmpty() && !usersRepo.existsById(user.getUserId())){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with the id: " + user.getUserId());
-        }
-
+        CouponsCentral existingCoupon = getCouponByCouponCodeId(id);
 
         updateCouponByCheckingFields(existingCoupon, newCoupon);
         try {
@@ -87,10 +84,5 @@ public class CouponsCentralService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id);
         }
         couponsCentralRepo.deleteById(id);
-    }
-
-    public List<CouponsCentralDTO> getCouponsByUserId(String userId) {
-        Users user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
-        return entityDTOMapper.toCouponsCentralDTOList(user.getCouponsCentrals());
     }
 }
