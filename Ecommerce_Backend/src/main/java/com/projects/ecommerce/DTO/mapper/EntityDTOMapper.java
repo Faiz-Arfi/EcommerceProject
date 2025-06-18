@@ -28,6 +28,15 @@ public class EntityDTOMapper {
         // dto.setCouponsCentrals(user.getCouponsCentrals());
         return dto;
     }
+    public List<UsersDTO> toUsersDTOList(List<Users> userList){
+        if(userList == null || userList.isEmpty()){
+            return new ArrayList<>();
+        }
+        return userList.stream()
+            .map(this::toUserDTO)
+            .toList();
+    }
+
     public HomePageDealsDTO toHomePageDealsDTO(HomePageDeals homePageDeals){
         if(homePageDeals == null){
             return null;
