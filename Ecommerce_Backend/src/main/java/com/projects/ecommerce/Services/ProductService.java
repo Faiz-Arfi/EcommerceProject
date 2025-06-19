@@ -3,6 +3,8 @@ package com.projects.ecommerce.Services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,8 +17,8 @@ public class ProductService {
     @Autowired
     private ProductRepo productRepo;
 
-    public List<Product> getAllProducts() {
-        return productRepo.findAll();
+    public Page<Product> getAllProducts(Pageable p) {
+        return productRepo.findAll(p);
     }
 
     public Product getProductById(String id) {
@@ -47,8 +49,8 @@ public class ProductService {
         return productRepo.save(product);
     }
 
-    public List<Product> searchProducts(String keyword) {
-        return productRepo.searchProduct(keyword);
+    public Page<Product> searchProducts(String keyword, Pageable p) {
+        return productRepo.searchProduct(keyword, p);
     }
 
     public Product updateProductById(Product newProduct, String id) {

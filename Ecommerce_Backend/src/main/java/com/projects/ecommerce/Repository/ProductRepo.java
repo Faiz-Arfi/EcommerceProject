@@ -2,6 +2,8 @@ package com.projects.ecommerce.Repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,6 @@ public interface ProductRepo extends JpaRepository<Product, String> {
            "LOWER(p.productDescription) LIKE LOWER(CONCAT('%', :keyword,'%')) OR " +
            "LOWER(p.productCategory) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Product> searchProduct(String keyword);
+    Page<Product> searchProduct(String keyword, Pageable p);
 
 }
