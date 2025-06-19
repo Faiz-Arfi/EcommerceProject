@@ -50,4 +50,36 @@ public class ProductService {
     public List<Product> searchProducts(String keyword) {
         return productRepo.searchProduct(keyword);
     }
+
+    public Product updateProductById(Product newProduct, String id) {
+        Product oldProduct = getProductById(id);
+        if(newProduct.getProductName() != null && !newProduct.getProductName().isEmpty()){
+            oldProduct.setProductName(newProduct.getProductName());
+        }
+        if(newProduct.getBrand() != null && !newProduct.getBrand().isEmpty()){
+            oldProduct.setBrand(newProduct.getBrand());
+        }
+        if(newProduct.getProductCategory() != null && !newProduct.getProductCategory().isEmpty()){
+            oldProduct.setProductCategory(newProduct.getProductCategory());
+        }
+        if(newProduct.getProductDescription() != null && !newProduct.getProductDescription().isEmpty()){
+            oldProduct.setProductDescription(newProduct.getProductDescription());
+        }
+        if(newProduct.getProductImageUrl() != null && !newProduct.getProductImageUrl().isEmpty()){
+            oldProduct.setProductImageUrl(newProduct.getProductImageUrl());
+        }
+        if(newProduct.getProductSize() != null && !newProduct.getProductSize().isEmpty()){
+            oldProduct.setProductSize(newProduct.getProductSize());
+        }
+
+        if(newProduct.getProductPrice() > 0.0){
+            oldProduct.setProductPrice(newProduct.getProductPrice());
+        }
+        
+        return productRepo.save(oldProduct);
+    }
+
+    public void deleteProductById(String id) {
+        productRepo.deleteById(id);
+    }
 }
