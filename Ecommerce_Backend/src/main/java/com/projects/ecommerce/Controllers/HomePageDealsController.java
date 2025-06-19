@@ -1,8 +1,8 @@
 package com.projects.ecommerce.Controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +25,9 @@ public class HomePageDealsController {
     public HomePageDealsService homePageDealsService;
 
     @GetMapping("/deals")
-    public List<HomePageDealsDTO> getAllDeals(){
+    public Page<HomePageDealsDTO> getAllDeals(Pageable p){
         try {
-            return homePageDealsService.getAllDealsDTO();
+            return homePageDealsService.getAllDealsDTOPage(p);
         } catch (ResponseStatusException ex) {
             throw ex;
         }

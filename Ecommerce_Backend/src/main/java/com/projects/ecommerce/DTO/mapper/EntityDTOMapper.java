@@ -3,6 +3,7 @@ package com.projects.ecommerce.DTO.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.projects.ecommerce.Entity.CouponsCentral;
@@ -37,6 +38,10 @@ public class EntityDTOMapper {
             .toList();
     }
 
+    public Page<UsersDTO> toUsersDTOPage(Page<Users> userList){
+        return userList.map(this::toUserDTO);
+    }
+
     public HomePageDealsDTO toHomePageDealsDTO(HomePageDeals homePageDeals){
         if(homePageDeals == null){
             return null;
@@ -60,6 +65,10 @@ public class EntityDTOMapper {
             .toList();
     }
 
+    public Page<HomePageDealsDTO> toHomePageDealsDTOPage(Page<HomePageDeals> homePageDealsList){
+        return homePageDealsList.map(this::toHomePageDealsDTO);
+    }
+
     public CouponsCentralDTO toCouponsCentralDTO(CouponsCentral couponsCentral){
         if(couponsCentral == null){
             return null;
@@ -79,5 +88,8 @@ public class EntityDTOMapper {
         return couponsCentralsList.stream()
             .map(this::toCouponsCentralDTO)
             .toList();
+    }
+    public Page<CouponsCentralDTO> toCouponsCentralDTOPage(Page<CouponsCentral> couponsCentralsList){
+        return couponsCentralsList.map(this::toCouponsCentralDTO);
     }
 }

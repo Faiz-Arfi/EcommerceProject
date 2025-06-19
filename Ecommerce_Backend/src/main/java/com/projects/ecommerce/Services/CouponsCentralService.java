@@ -3,6 +3,8 @@ package com.projects.ecommerce.Services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,8 +45,14 @@ public class CouponsCentralService {
         return couponsCentralRepo.findAll();
     
     }
+    public Page<CouponsCentral> getAllCouponsPage(Pageable p){
+        return couponsCentralRepo.findAll(p);
+    }
     public List<CouponsCentralDTO> getAllCouponsDTO(){
         return entityDTOMapper.toCouponsCentralDTOList(getAllCoupons());
+    }
+    public Page<CouponsCentralDTO> getAllCouponsDTOPage(Pageable p){
+        return entityDTOMapper.toCouponsCentralDTOPage(getAllCouponsPage(p));
     }
 
     public CouponsCentral getCouponByCouponCodeId(String id){

@@ -3,6 +3,8 @@ package com.projects.ecommerce.Services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,11 +51,24 @@ public class HomePageDealsService {
     public List<HomePageDeals> getAllDeals(){
         return homePageDealsRepo.findAll();
     }
-    public List<HomePageDealsDTO> getAllDealsDTO() {
+    public Page<HomePageDeals> getAllDealsPage(Pageable p){
+        return homePageDealsRepo.findAll(p);
+    }
+    public List<HomePageDealsDTO> getAllDealsDTO(Pageable p) {
         try {
             List<HomePageDeals> homePageDealsList = getAllDeals();
             //convert to DTO and return
             return entityDTOMapper.toHomePageDealsDTOList(homePageDealsList);
+
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to fetch all deals", ex);
+        }
+    }
+    public Page<HomePageDealsDTO> getAllDealsDTOPage(Pageable p) {
+        try {
+            Page<HomePageDeals> homePageDealsList = getAllDealsPage(p);
+            //convert to DTO and return
+            return entityDTOMapper.toHomePageDealsDTOPage(homePageDealsList);
 
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to fetch all deals", ex);

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,6 @@ public class UsersService {
     @Autowired
     private EntityDTOMapper entityDTOMapper;
 
-    public List<UsersDTO> saveAllUsers(List<Users> userList) {
-        return entityDTOMapper.toUsersDTOList(usersRepo.saveAll(userList));
-    }
-
     public UsersDTO saveUser(Users user) {
         if(usersRepo.existsByEmail(user.getEmail())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user already exists with the same email");
@@ -59,8 +57,8 @@ public class UsersService {
         return entityDTOMapper.toUserDTO(usersRepo.save(user));
     }
 
-    public List<UsersDTO> getAllUsersDTO() {
-        return entityDTOMapper.toUsersDTOList(usersRepo.findAll());
+    public Page<UsersDTO> getAllUsersDTO(Pageable p) {
+        return entityDTOMapper.toUsersDTOPage(usersRepo.findAll(p));
     }
     
     public Users getUserById(String userId) {
