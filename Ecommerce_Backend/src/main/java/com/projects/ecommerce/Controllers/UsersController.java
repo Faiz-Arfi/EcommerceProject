@@ -2,16 +2,14 @@ package com.projects.ecommerce.Controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projects.ecommerce.Entity.Users;
@@ -19,16 +17,22 @@ import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Entity.DTO.UsersDTO;
 import com.projects.ecommerce.Services.UsersService;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 public class UsersController {
-    @Autowired
-    private UsersService usersService;
+
+    private final UsersService usersService;
+
+    public UsersController(UsersService usersService) {
+        this.usersService = usersService;
+    }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UsersDTO registerUser(@RequestBody Users user){
-        return usersService.saveUser(user);
+    public ResponseEntity<UsersDTO> registerUser(@RequestBody Users user, UriComponentsBuilder uriBuilder){
+        UsersDTO savedUser = usersService.saveUser(user);
+        var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
+        return ResponseEntity.created(location).body(savedUser);
     }
 
     @GetMapping("/users")
@@ -43,17 +47,21 @@ public class UsersController {
     }
 
     @PostMapping("/users/coupons")
-    public UsersDTO setUserCoupon(
+    public ResponseEntity<UsersDTO> setUserCoupon(
             @RequestParam String userId,
-            @RequestParam String couponId) {
-        return usersService.setCouponsForUserId(userId, couponId);
+            @RequestParam String couponId,
+            UriComponentsBuilder uriBuilder) {
+        var location = uriBuilder.path("/users/coupons/{userId}").buildAndExpand(userId).toUri();
+        return ResponseEntity.created(location).body(usersService.setCouponsForUserId(userId, couponId));
     }
 
     @PostMapping("/users/deals")
-        public UsersDTO setUserDeals(
+        public ResponseEntity<UsersDTO> setUserDeals(
             @RequestParam String userId,
-            @RequestParam String dealId) {
-        return usersService.setDealsForUserId(userId, dealId);
+            @RequestParam String dealId,
+            UriComponentsBuilder uriBuilder) {
+        var location = uriBuilder.path("/users/deals/{userId}").buildAndExpand(userId).toUri();
+        return ResponseEntity.created(location).body(usersService.setDealsForUserId(userId, dealId));
     }
 
     @GetMapping("/users/deals/{userId}")

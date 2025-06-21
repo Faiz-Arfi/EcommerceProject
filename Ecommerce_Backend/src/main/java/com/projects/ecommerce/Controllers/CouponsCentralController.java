@@ -2,21 +2,16 @@ package com.projects.ecommerce.Controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.projects.ecommerce.Services.CouponsCentralService;
 import com.projects.ecommerce.Entity.CouponsCentral;
 import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
+@RequestMapping("/couponcentral")
 public class CouponsCentralController {
 
     private final CouponsCentralService couponsCentralService;
@@ -24,30 +19,32 @@ public class CouponsCentralController {
     public CouponsCentralController(CouponsCentralService couponsCentralService) {
         this.couponsCentralService = couponsCentralService;
     }
-    
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/couponcentral")
-    public CouponsCentralDTO saveCoupon(@RequestBody CouponsCentral couponsCentral){
-        return couponsCentralService.saveCoupon(couponsCentral);
+
+    @PostMapping
+    public ResponseEntity<CouponsCentralDTO> saveCoupon(@RequestBody CouponsCentral couponsCentral,
+                                                        UriComponentsBuilder uriBuilder){
+        CouponsCentralDTO savedCouponsCentral = couponsCentralService.saveCoupon(couponsCentral);
+        var location = uriBuilder.path("/couponcentral/{id}").buildAndExpand(savedCouponsCentral.getCouponId()).toUri();
+        return ResponseEntity.created(location).body(savedCouponsCentral);
     }
 
-    @GetMapping("/couponcentral")
+    @GetMapping
     public Page<CouponsCentralDTO> getAllCoupons(Pageable p){
         couponsCentralService.validateSearchParamater(p);
         return couponsCentralService.getAllCouponsDTOPage(p);
     }
 
-    @GetMapping("/couponcentral/id/{id}")
+    @GetMapping("/{id}")
     public CouponsCentralDTO getCouponById(@PathVariable String id){
         return couponsCentralService.getCouponDTOByCouponId(id);
     }
 
-    @PutMapping("/couponcentral/id/{id}")
+    @PutMapping("/{id}")
     public CouponsCentralDTO updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable String id){
         return couponsCentralService.updateCouponByCouponId(coupon, id);
     }
 
-    @DeleteMapping("/couponcentral/id/{id}")
+    @DeleteMapping("/{id}")
     public void deleteCouponById(@PathVariable String id){
         couponsCentralService.deleteCouponByCouponId(id);
     }

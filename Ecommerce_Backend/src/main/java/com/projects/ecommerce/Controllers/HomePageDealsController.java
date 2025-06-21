@@ -2,22 +2,17 @@ package com.projects.ecommerce.Controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.projects.ecommerce.Entity.HomePageDeals;
 import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Services.HomePageDealsService;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 @RestController
+@RequestMapping("/deals")
 public class HomePageDealsController {
 
     private final HomePageDealsService homePageDealsService;
@@ -26,29 +21,30 @@ public class HomePageDealsController {
         this.homePageDealsService = homePageDealsService;
     }
 
-    @GetMapping("/deals")
+    @GetMapping
     public Page<HomePageDealsDTO> getAllDeals(Pageable p){
         homePageDealsService.validateSearchParameter(p);
         return homePageDealsService.getAllDealsDTOPage(p);
     }
 
-    @GetMapping("/deals/id/{dealId}")
+    @GetMapping("/{dealId}")
     public HomePageDealsDTO getDealsByDealId(@PathVariable String dealId){
         return homePageDealsService.getDealDTOByDealId(dealId);
     }
 
-    @PostMapping("/deals")
-    @ResponseStatus(HttpStatus.CREATED)
-    public HomePageDealsDTO putDeals(@RequestBody HomePageDeals homePageDeals){
-        return homePageDealsService.saveDeals(homePageDeals);
+    @PostMapping
+    public ResponseEntity<HomePageDealsDTO> putDeals(@RequestBody HomePageDeals homePageDeals, UriComponentsBuilder uriBuilder){
+        HomePageDealsDTO savedHomePageDeal = homePageDealsService.saveDeals(homePageDeals);
+        var location = uriBuilder.path("/deals/{dealId}").buildAndExpand(savedHomePageDeal.getDealId()).toUri();
+        return ResponseEntity.created(location).body(savedHomePageDeal);
     }
 
-    @PutMapping("/deals/{dealId}")
+    @PutMapping("/{dealId}")
     public HomePageDealsDTO updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
         return homePageDealsService.updateDealsByDealId(dealId, newDeals);
     }
 
-    @DeleteMapping("/deals/{dealId}")
+    @DeleteMapping("/{dealId}")
     public void deleteDeals(@PathVariable String dealId){
         homePageDealsService.deleteDealsByDealId(dealId);
     }
