@@ -1,8 +1,9 @@
 package com.projects.ecommerce.Services;
 
 import java.util.List;
+import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.projects.ecommerce.Constants.SortConstants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,16 @@ import com.projects.ecommerce.Repository.HomePageDealsRepo;
 
 @Service
 public class HomePageDealsService {
-    @Autowired
-    private HomePageDealsRepo homePageDealsRepo;
-    @Autowired
-    private EntityDTOMapper entityDTOMapper;
+
+    private final HomePageDealsRepo homePageDealsRepo;
+    private final EntityDTOMapper entityDTOMapper;
+    private final UtilityService utilityService;
+
+    public HomePageDealsService (HomePageDealsRepo homePageDealsRepo, EntityDTOMapper entityDTOMapper, UtilityService utilityService) {
+        this.homePageDealsRepo = homePageDealsRepo;
+        this.entityDTOMapper = entityDTOMapper;
+        this.utilityService = utilityService;
+    }
 
     public HomePageDealsDTO saveDeals(HomePageDeals homePageDeals) {
         if(homePageDealsRepo.existsByDealName(homePageDeals.getDealName())){
@@ -51,10 +58,12 @@ public class HomePageDealsService {
     public List<HomePageDeals> getAllDeals(){
         return homePageDealsRepo.findAll();
     }
+
     public Page<HomePageDeals> getAllDealsPage(Pageable p){
         return homePageDealsRepo.findAll(p);
     }
-    public List<HomePageDealsDTO> getAllDealsDTO(Pageable p) {
+
+    public List<HomePageDealsDTO> getAllDealsDTO() {
         try {
             List<HomePageDeals> homePageDealsList = getAllDeals();
             //convert to DTO and return
@@ -64,6 +73,7 @@ public class HomePageDealsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to fetch all deals", ex);
         }
     }
+
     public Page<HomePageDealsDTO> getAllDealsDTOPage(Pageable p) {
         try {
             Page<HomePageDeals> homePageDealsList = getAllDealsPage(p);
@@ -123,4 +133,8 @@ public class HomePageDealsService {
         homePageDealsRepo.deleteById(dealId);
     }
 
+    public void validateSearchParameter(Pageable p) {
+        Set<String> validSortFields = SortConstants.DEALS_SORT_FIELDS;
+        utilityService.validateSearchParamater(p, validSortFields);
+    }
 }

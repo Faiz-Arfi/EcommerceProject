@@ -1,7 +1,7 @@
 package com.projects.ecommerce.Services;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.projects.ecommerce.Constants.SortConstants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -11,10 +11,18 @@ import org.springframework.web.server.ResponseStatusException;
 import com.projects.ecommerce.Entity.Product;
 import com.projects.ecommerce.Repository.ProductRepo;
 
+import java.util.Set;
+
 @Service
 public class ProductService {
-    @Autowired
-    private ProductRepo productRepo;
+
+    private final ProductRepo productRepo;
+    private final UtilityService utilityService;
+
+    public ProductService(ProductRepo productRepo, UtilityService utilityService){
+        this.productRepo = productRepo;
+        this.utilityService = utilityService;
+    }
 
     public Page<Product> getAllProducts(Pageable p) {
         return productRepo.findAll(p);
@@ -82,5 +90,10 @@ public class ProductService {
 
     public void deleteProductById(String id) {
         productRepo.deleteById(id);
+    }
+
+    public void validateSortingParameters(Pageable p) {
+        Set<String> validSortFields = SortConstants.PRODUCT_SORT_FIELDS;
+        utilityService.validateSearchParamater(p, validSortFields);
     }
 }

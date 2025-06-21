@@ -1,6 +1,5 @@
 package com.projects.ecommerce.Controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import com.projects.ecommerce.Entity.HomePageDeals;
@@ -21,53 +19,38 @@ import com.projects.ecommerce.Services.HomePageDealsService;
 
 @RestController
 public class HomePageDealsController {
-    @Autowired
-    public HomePageDealsService homePageDealsService;
+
+    private final HomePageDealsService homePageDealsService;
+
+    public HomePageDealsController(HomePageDealsService homePageDealsService) {
+        this.homePageDealsService = homePageDealsService;
+    }
 
     @GetMapping("/deals")
     public Page<HomePageDealsDTO> getAllDeals(Pageable p){
-        try {
-            return homePageDealsService.getAllDealsDTOPage(p);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
+        homePageDealsService.validateSearchParameter(p);
+        return homePageDealsService.getAllDealsDTOPage(p);
     }
 
     @GetMapping("/deals/id/{dealId}")
     public HomePageDealsDTO getDealsByDealId(@PathVariable String dealId){
-        try {
-            return homePageDealsService.getDealDTOByDealId(dealId);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
+        return homePageDealsService.getDealDTOByDealId(dealId);
     }
 
     @PostMapping("/deals")
     @ResponseStatus(HttpStatus.CREATED)
     public HomePageDealsDTO putDeals(@RequestBody HomePageDeals homePageDeals){
-        try {
-            return homePageDealsService.saveDeals(homePageDeals);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
+        return homePageDealsService.saveDeals(homePageDeals);
     }
 
     @PutMapping("/deals/{dealId}")
     public HomePageDealsDTO updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
-        try {
-            return homePageDealsService.updateDealsByDealId(dealId, newDeals);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
+        return homePageDealsService.updateDealsByDealId(dealId, newDeals);
     }
 
     @DeleteMapping("/deals/{dealId}")
     public void deleteDeals(@PathVariable String dealId){
-        try {
-            homePageDealsService.deleteDealsByDealId(dealId);
-        } catch (ResponseStatusException ex) {
-            throw ex;
-        }
+        homePageDealsService.deleteDealsByDealId(dealId);
     }
 
 }

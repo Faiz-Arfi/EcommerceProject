@@ -1,8 +1,9 @@
 package com.projects.ecommerce.Services;
 
 import java.util.List;
+import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.projects.ecommerce.Constants.SortConstants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,15 @@ import com.projects.ecommerce.Repository.CouponsCentralRepo;
 @Service
 public class CouponsCentralService {
 
-    @Autowired
-    private CouponsCentralRepo couponsCentralRepo;
-    @Autowired
-    private EntityDTOMapper entityDTOMapper;
+    private final CouponsCentralRepo couponsCentralRepo;
+    private final EntityDTOMapper entityDTOMapper;
+    private final UtilityService utilityService;
+
+    public CouponsCentralService (CouponsCentralRepo couponsCentralRepo, EntityDTOMapper entityDTOMapper, UtilityService utilityService) {
+        this.couponsCentralRepo = couponsCentralRepo;
+        this.entityDTOMapper = entityDTOMapper;
+        this.utilityService = utilityService;
+    }
 
     public CouponsCentralDTO saveCoupon(CouponsCentral couponsCentral){
         if(couponsCentralRepo.existsByCouponCode(couponsCentral.getCouponCode())){
@@ -45,12 +51,15 @@ public class CouponsCentralService {
         return couponsCentralRepo.findAll();
     
     }
+
     public Page<CouponsCentral> getAllCouponsPage(Pageable p){
         return couponsCentralRepo.findAll(p);
     }
+
     public List<CouponsCentralDTO> getAllCouponsDTO(){
         return entityDTOMapper.toCouponsCentralDTOList(getAllCoupons());
     }
+
     public Page<CouponsCentralDTO> getAllCouponsDTOPage(Pageable p){
         return entityDTOMapper.toCouponsCentralDTOPage(getAllCouponsPage(p));
     }
@@ -92,5 +101,10 @@ public class CouponsCentralService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Coupon not found with id: "+ id);
         }
         couponsCentralRepo.deleteById(id);
+    }
+
+    public void validateSearchParamater(Pageable p) {
+        Set<String> validSortFields = SortConstants.COUPON_SORT_FIELDS;
+        utilityService.validateSearchParamater(p, validSortFields);
     }
 }
