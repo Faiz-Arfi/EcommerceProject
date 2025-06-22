@@ -54,6 +54,7 @@ public class UsersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("USER"));
         return entityDTOMapper.toUserDTO(usersRepo.save(user));
     }
 

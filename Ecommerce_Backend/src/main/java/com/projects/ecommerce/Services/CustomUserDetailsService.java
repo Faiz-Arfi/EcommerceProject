@@ -25,9 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService{
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
-
-
-        return new User(user.getEmail(), user.getPassword(), Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+        // Convert Users entity to UserDetails
+        return User.withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRoles().toArray(new String[0]))
+                .build();
     }
 
 }

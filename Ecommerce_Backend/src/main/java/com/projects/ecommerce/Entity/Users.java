@@ -52,4 +52,6 @@ public class Users {
     @JoinTable(name = "user_home_page_deals", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "deal_id"))
     private List<HomePageDeals> homePageDeals;
 
+    private List<String> roles;
+
 }
