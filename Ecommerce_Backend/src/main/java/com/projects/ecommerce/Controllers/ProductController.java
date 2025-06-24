@@ -2,11 +2,13 @@ package com.projects.ecommerce.Controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.projects.ecommerce.Entity.Product;
 import com.projects.ecommerce.Services.ProductService;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -29,7 +31,11 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable String id){
-        return productService.getProductById(id);
+        try {
+            return productService.getProductById(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with ID: " + id);
+        }
     }
 
     @PostMapping

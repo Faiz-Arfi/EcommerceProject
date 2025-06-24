@@ -3,10 +3,12 @@ package com.projects.ecommerce.Services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,16 +25,23 @@ import com.projects.ecommerce.Repository.UsersRepo;
 @Service
 public class UsersService {
 
-    @Autowired
-    private UsersRepo usersRepo;
-    @Autowired
-    private CouponsCentralService couponsCentralService;
-    @Autowired
-    private HomePageDealsService homePageDealsService;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-    private EntityDTOMapper entityDTOMapper;
+    private final UsersRepo usersRepo;
+    private final CouponsCentralService couponsCentralService;
+    private final HomePageDealsService homePageDealsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EntityDTOMapper entityDTOMapper;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
+    public UsersService(UsersRepo usersRepo, CouponsCentralService couponsCentralService, HomePageDealsService homePageDealsService, BCryptPasswordEncoder bCryptPasswordEncoder, EntityDTOMapper entityDTOMapper, AuthenticationManager authenticationManager, JwtService jwtService) {
+        this.usersRepo = usersRepo;
+        this.couponsCentralService = couponsCentralService;
+        this.homePageDealsService = homePageDealsService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.entityDTOMapper = entityDTOMapper;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     public UsersDTO saveUser(Users user) {
         if(usersRepo.existsByEmail(user.getEmail())){
@@ -116,4 +125,16 @@ public class UsersService {
         return entityDTOMapper.toCouponsCentralDTOList(user.getCouponsCentrals());
     }
 
+    public String verifyUser(Users user) {
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        user.getEmail(), user.getPassword()
+                )
+        );
+
+        if(authenticate.isAuthenticated()){
+            return jwtService.generateToken(user);
+        }
+        return "failure";
+    }
 }

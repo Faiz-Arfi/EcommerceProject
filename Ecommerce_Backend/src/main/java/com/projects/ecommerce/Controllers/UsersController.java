@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
 import com.projects.ecommerce.Entity.DTO.UsersDTO;
 import com.projects.ecommerce.Services.UsersService;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -30,9 +32,13 @@ public class UsersController {
 
     @PostMapping("/register")
     public ResponseEntity<UsersDTO> registerUser(@RequestBody Users user, UriComponentsBuilder uriBuilder){
-        UsersDTO savedUser = usersService.saveUser(user);
-        var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
-        return ResponseEntity.created(location).body(savedUser);
+        try{
+            UsersDTO savedUser = usersService.saveUser(user);
+            var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
+            return ResponseEntity.created(location).body(savedUser);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
     }
 
     @GetMapping("/users")
@@ -72,6 +78,15 @@ public class UsersController {
     @GetMapping("/users/coupons/{userId}")
     public List<CouponsCentralDTO> getCouponsByUserId(@PathVariable String userId){
         return usersService.getCouponsByUserId(userId);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody Users user) {
+        String token = usersService.verifyUser(user);
+        if ("failure".equals(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+        return ResponseEntity.ok(token);
     }
 
 }
