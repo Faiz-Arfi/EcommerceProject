@@ -26,7 +26,7 @@ public class JwtService {
                 .subject(user.getEmail())
                 .issuer("MTR")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 1))
                 .and()
                 .signWith(generateKey())
                 .compact();

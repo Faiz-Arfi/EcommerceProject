@@ -2,6 +2,7 @@ package com.projects.ecommerce.Config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +38,7 @@ public class WebSecurityConfig {
         httpSecurity
                 .authenticationProvider(authenticationProvider()) // Register custom DaoAuthenticationProvider
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/login", "/register", "/navitems/**", "/couponcentral/**", "/product/**",
+                        .requestMatchers("/","/test","/login/**", "/register/**", "/navitems/**", "/couponcentral/**", "/product/**",
                                 "/deals/**", "/error", "/error/**", "/favicon.ico/**", "/favicon.ico")
                         .permitAll()
                         .requestMatchers("/users/**").authenticated()
@@ -50,13 +51,17 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
+        configuration.addAllowedOrigin(frontendUrl);
         // For development/testing, allow all origins
         configuration.addAllowedOrigin("*");
-        
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         
         // Add ngrok-specific header to allowed headers

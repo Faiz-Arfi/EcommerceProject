@@ -9,4 +9,8 @@ public class TestController {
     public String test() {
         return "Test successful!";
     }
+    @GetMapping("/")
+    public String home() {
+        return "Welcome to Ecommerce Backend! The server is running: to view api documentation, please visit: https://documenter.getpostman.com/view/38381039/2sB2xEAoNg";
+    }
 }
