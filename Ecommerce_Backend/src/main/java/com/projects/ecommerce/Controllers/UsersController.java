@@ -37,7 +37,7 @@ public class UsersController {
             var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
             return ResponseEntity.created(location).body(savedUser);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
         }
     }
 
