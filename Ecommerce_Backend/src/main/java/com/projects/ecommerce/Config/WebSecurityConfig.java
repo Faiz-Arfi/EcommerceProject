@@ -43,6 +43,7 @@ public class WebSecurityConfig {
                         .permitAll()
                         .requestMatchers("/users/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/moderator/**").hasRole("MODERATOR")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .cors(Customizer.withDefaults()) // Enable CORS to avoid the error

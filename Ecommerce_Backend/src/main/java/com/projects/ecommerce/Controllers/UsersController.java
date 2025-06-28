@@ -33,7 +33,7 @@ public class UsersController {
     @PostMapping("/register")
     public ResponseEntity<UsersDTO> registerUser(@RequestBody Users user, UriComponentsBuilder uriBuilder){
         try{
-            UsersDTO savedUser = usersService.saveUser(user);
+            UsersDTO savedUser = usersService.saveUser(user, false);
             var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
             return ResponseEntity.created(location).body(savedUser);
         } catch (Exception e) {
@@ -87,6 +87,17 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/moderator/add-admins")
+    public ResponseEntity<UsersDTO> registerAdmin(@RequestBody Users user, UriComponentsBuilder uriBuilder){
+        try{
+            UsersDTO savedUser = usersService.saveUser(user, true);
+            var location = uriBuilder.path("/users/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
+            return ResponseEntity.created(location).body(savedUser);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+        }
     }
 
 }
