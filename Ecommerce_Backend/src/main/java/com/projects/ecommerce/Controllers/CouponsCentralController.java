@@ -11,7 +11,6 @@ import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/couponcentral")
 public class CouponsCentralController {
 
     private final CouponsCentralService couponsCentralService;
@@ -20,7 +19,7 @@ public class CouponsCentralController {
         this.couponsCentralService = couponsCentralService;
     }
 
-    @PostMapping
+    @PostMapping("/admin/couponcentral")
     public ResponseEntity<CouponsCentralDTO> saveCoupon(@RequestBody CouponsCentral couponsCentral,
                                                         UriComponentsBuilder uriBuilder){
         CouponsCentralDTO savedCouponsCentral = couponsCentralService.saveCoupon(couponsCentral);
@@ -28,23 +27,23 @@ public class CouponsCentralController {
         return ResponseEntity.created(location).body(savedCouponsCentral);
     }
 
-    @GetMapping
+    @GetMapping("/couponcentral")
     public Page<CouponsCentralDTO> getAllCoupons(Pageable p){
         couponsCentralService.validateSearchParamater(p);
         return couponsCentralService.getAllCouponsDTOPage(p);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/couponcentral/{id}")
     public CouponsCentralDTO getCouponById(@PathVariable String id){
         return couponsCentralService.getCouponDTOByCouponId(id);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/couponcentral/{id}")
     public CouponsCentralDTO updateCouponById(@RequestBody CouponsCentral coupon, @PathVariable String id){
         return couponsCentralService.updateCouponByCouponId(coupon, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/couponcentral/{id}")
     public void deleteCouponById(@PathVariable String id){
         couponsCentralService.deleteCouponByCouponId(id);
     }

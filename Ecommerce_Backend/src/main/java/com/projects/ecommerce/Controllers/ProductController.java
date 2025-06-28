@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -21,7 +20,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
+    @GetMapping("/product")
     public Page<Product> getAllProducts(Pageable p){
         System.out.println(p.getSort());
         //validate if sorting parameters are valid
@@ -29,7 +28,7 @@ public class ProductController {
         return productService.getAllProducts(p);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/product/{id}")
     public Product getProductById(@PathVariable String id){
         try {
             return productService.getProductById(id);
@@ -38,24 +37,24 @@ public class ProductController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/admin/product")
     public ResponseEntity<Product> saveProduct(@RequestBody Product product, UriComponentsBuilder uriBuilder){
         Product savedProduct = productService.saveProduct(product);
         var location = uriBuilder.path("/product/{id}").buildAndExpand(savedProduct.getProductId()).toUri();
         return ResponseEntity.created(location).body(savedProduct);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/product/{id}")
     public Product updateProductById(@RequestBody Product product, @PathVariable String id){
         return productService.updateProductById(product, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/product/{id}")
     public void deleteProductById(@PathVariable String id){
         productService.deleteProductById(id);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/product/search")
     public Page<Product> searchProducts(@RequestParam String keyword, Pageable p){
         productService.validateSortingParameters(p);
         return productService.searchProducts(keyword, p);

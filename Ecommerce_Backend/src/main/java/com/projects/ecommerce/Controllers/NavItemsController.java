@@ -10,7 +10,6 @@ import com.projects.ecommerce.Services.NavItemsService;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/navitems")
 public class NavItemsController {
 
     private final NavItemsService navItemsService;
@@ -19,29 +18,29 @@ public class NavItemsController {
         this.navItemsService = navItemsService;
     }
 
-    @PostMapping
+    @PostMapping("/admin/navitems")
     public ResponseEntity<NavItems> saveNavItems(@RequestBody NavItems navItems, UriComponentsBuilder uriBuilder) {
         NavItems savedNavItems = navItemsService.saveNavItems(navItems);
         var location = uriBuilder.path("/navitems/{itemId}").buildAndExpand(savedNavItems.getItemId()).toUri();
         return ResponseEntity.created(location).body(savedNavItems);
     }
 
-    @GetMapping
+    @GetMapping("/navitems")
     public List<NavItems> getAllItems(){
         return navItemsService.getAllItems();
     }
 
-    @GetMapping("/{itemId}")
+    @GetMapping("/navitems/{itemId}")
     public NavItems getItemById(@PathVariable String itemId){
         return navItemsService.getItemById(itemId);
     }
 
-    @PutMapping("/{itemId}")
+    @PutMapping("/admin/navitems/{itemId}")
     public NavItems updateItemById(@RequestBody NavItems navItems, @PathVariable String itemId){
         return navItemsService.updateItemsById(navItems, itemId);
     }
 
-    @DeleteMapping("/{itemId}")
+    @DeleteMapping("/admin/navitems/{itemId}")
     public void deleteItemById(@PathVariable String itemId){
         navItemsService.deleteItemById(itemId);
     }

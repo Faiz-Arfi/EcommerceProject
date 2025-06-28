@@ -12,7 +12,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 
 @RestController
-@RequestMapping("/deals")
 public class HomePageDealsController {
 
     private final HomePageDealsService homePageDealsService;
@@ -21,30 +20,30 @@ public class HomePageDealsController {
         this.homePageDealsService = homePageDealsService;
     }
 
-    @GetMapping
+    @GetMapping("/deals")
     public Page<HomePageDealsDTO> getAllDeals(Pageable p){
         homePageDealsService.validateSearchParameter(p);
         return homePageDealsService.getAllDealsDTOPage(p);
     }
 
-    @GetMapping("/{dealId}")
+    @GetMapping("/deals/{dealId}")
     public HomePageDealsDTO getDealsByDealId(@PathVariable String dealId){
         return homePageDealsService.getDealDTOByDealId(dealId);
     }
 
-    @PostMapping
+    @PostMapping("/admin/deals")
     public ResponseEntity<HomePageDealsDTO> putDeals(@RequestBody HomePageDeals homePageDeals, UriComponentsBuilder uriBuilder){
         HomePageDealsDTO savedHomePageDeal = homePageDealsService.saveDeals(homePageDeals);
         var location = uriBuilder.path("/deals/{dealId}").buildAndExpand(savedHomePageDeal.getDealId()).toUri();
         return ResponseEntity.created(location).body(savedHomePageDeal);
     }
 
-    @PutMapping("/{dealId}")
+    @PutMapping("/admin/deals/{dealId}")
     public HomePageDealsDTO updateDeals(@PathVariable String dealId, @RequestBody HomePageDeals newDeals){
         return homePageDealsService.updateDealsByDealId(dealId, newDeals);
     }
 
-    @DeleteMapping("/{dealId}")
+    @DeleteMapping("/admin/deals/{dealId}")
     public void deleteDeals(@PathVariable String dealId){
         homePageDealsService.deleteDealsByDealId(dealId);
     }
