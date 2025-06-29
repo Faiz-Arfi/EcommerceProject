@@ -1,5 +1,6 @@
 package com.projects.ecommerce.Controllers;
 
+import com.projects.ecommerce.Entity.DTO.ProductDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,31 +22,31 @@ public class ProductController {
     }
 
     @GetMapping("/product")
-    public Page<Product> getAllProducts(Pageable p){
+    public Page<ProductDTO> getAllProducts(Pageable p){
         System.out.println(p.getSort());
         //validate if sorting parameters are valid
         productService.validateSortingParameters(p);
-        return productService.getAllProducts(p);
+        return productService.getAllProductsDTO(p);
     }
 
     @GetMapping("/product/{id}")
-    public Product getProductById(@PathVariable String id){
+    public ProductDTO getProductById(@PathVariable String id){
         try {
-            return productService.getProductById(id);
+            return productService.getProductDTOById(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with ID: " + id);
         }
     }
 
     @PostMapping("/admin/product")
-    public ResponseEntity<Product> saveProduct(@RequestBody Product product, UriComponentsBuilder uriBuilder){
-        Product savedProduct = productService.saveProduct(product);
+    public ResponseEntity<ProductDTO> saveProduct(@RequestBody Product product, UriComponentsBuilder uriBuilder){
+        ProductDTO savedProduct = productService.saveProduct(product);
         var location = uriBuilder.path("/product/{id}").buildAndExpand(savedProduct.getProductId()).toUri();
         return ResponseEntity.created(location).body(savedProduct);
     }
 
     @PutMapping("/admin/product/{id}")
-    public Product updateProductById(@RequestBody Product product, @PathVariable String id){
+    public ProductDTO updateProductById(@RequestBody Product product, @PathVariable String id){
         return productService.updateProductById(product, id);
     }
 
@@ -55,8 +56,8 @@ public class ProductController {
     }
 
     @GetMapping("/product/search")
-    public Page<Product> searchProducts(@RequestParam String keyword, Pageable p){
+    public Page<ProductDTO> searchProducts(@RequestParam String keyword, Pageable p){
         productService.validateSortingParameters(p);
-        return productService.searchProducts(keyword, p);
+        return productService.searchProductsDTO(keyword, p);
     }
 }

@@ -1,11 +1,9 @@
 package com.projects.ecommerce.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +23,10 @@ public class Product {
     private String productImageUrl;
     @Column(nullable = false)
     private String productDescription;
-    @Column(nullable = false)
-    private String productCategory;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "category_id")
+    private Category category;
     @Column(nullable = false)
     private String brand;
     @Column(nullable = false)
