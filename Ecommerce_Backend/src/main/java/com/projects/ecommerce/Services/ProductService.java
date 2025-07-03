@@ -53,31 +53,39 @@ public class ProductService {
         return entityDTOMapper.toProductDTO(product);
     }
 
-    public ProductDTO saveProduct(Product product) {
-        if (product.getCategory() == null || product.getCategory().getCategoryName() == null) {
+    public ProductDTO saveProduct(ProductDTO productDTO) {
+        if (productDTO.getCategoryId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product category cannot be empty");
         }
-        // Fetch the existing category from DB
-        Category existingCategory = categoryService.getCategoryByCategoryName(product.getCategory().getCategoryName());
-        product.setCategory(existingCategory);
 
-        if(product.getProductName() == null || product.getProductName().isEmpty()){
+
+        if(productDTO.getProductName() == null || productDTO.getProductName().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product name cannot be empty");
         }
-        if(product.getProductImageUrl() == null || product.getProductImageUrl().isEmpty()){
+        if(productDTO.getProductImageUrl() == null || productDTO.getProductImageUrl().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product image URL cannot be empty");
         }
-        if(product.getProductDescription() == null || product.getProductDescription().isEmpty()){
+        if(productDTO.getProductDescription() == null || productDTO.getProductDescription().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product description cannot be empty");
         }
-        if(product.getBrand() == null || product.getBrand().isEmpty()){
+        if(productDTO.getBrand() == null || productDTO.getBrand().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product brand cannot be empty");
         }
-        if(product.getProductPrice() <= 0){
+        if(productDTO.getProductPrice() <= 0){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product price must be greater than zero");
         }
 
-        product.getCategory().getProducts().add(product);
+        Category existingCategory = categoryService.getCategoryById(productDTO.getCategoryId());
+
+        Product product = new Product();
+        product.setCategory(existingCategory);
+        product.setProductName(productDTO.getProductName());
+        product.setProductDescription(productDTO.getProductDescription());
+        product.setProductImageUrl(productDTO.getProductImageUrl());
+        product.setBrand(productDTO.getBrand());
+        product.setProductPrice(productDTO.getProductPrice());
+        product.setProductSize(productDTO.getProductSize());
+
         return entityDTOMapper.toProductDTO(productRepo.save(product));
     }
 
@@ -90,7 +98,7 @@ public class ProductService {
         return entityDTOMapper.toProductDTOPage(products);
     }
 
-    public ProductDTO updateProductById(Product newProduct, String id) {
+    public ProductDTO updateProductById(ProductDTO newProduct, String id) {
         Product oldProduct = getProductById(id);
         if(newProduct.getProductName() != null && !newProduct.getProductName().isEmpty()){
             oldProduct.setProductName(newProduct.getProductName());
@@ -98,11 +106,12 @@ public class ProductService {
         if(newProduct.getBrand() != null && !newProduct.getBrand().isEmpty()){
             oldProduct.setBrand(newProduct.getBrand());
         }
-        if(newProduct.getCategory() != null){
+        if(newProduct.getCategoryId() != null){
             if(oldProduct.getCategory() != null){
                 oldProduct.getCategory().getProducts().remove(oldProduct);
             }
-            oldProduct.setCategory(newProduct.getCategory());
+            Category newCategory = categoryService.getCategoryById(newProduct.getCategoryId());
+            oldProduct.setCategory(newCategory);
             oldProduct.getCategory().getProducts().add(oldProduct);
         }
         if(newProduct.getProductDescription() != null && !newProduct.getProductDescription().isEmpty()){

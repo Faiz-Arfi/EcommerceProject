@@ -39,7 +39,7 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider()) // Register custom DaoAuthenticationProvider
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/","/test","/login/**", "/register/**", "/navitems/**", "/couponcentral/**", "/product/**",
-                                "/deals/**", "/category/**", "/error", "/error/**", "/favicon.ico/**", "/favicon.ico")
+                                "/deals/**", "/category/**", "/shopbycategory/**","/error", "/error/**", "/favicon.ico/**", "/favicon.ico")
                         .permitAll()
                         .requestMatchers("/users/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -4,13 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.projects.ecommerce.Entity.*;
-import com.projects.ecommerce.Entity.DTO.ProductDTO;
+import com.projects.ecommerce.Entity.DTO.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-
-import com.projects.ecommerce.Entity.DTO.CouponsCentralDTO;
-import com.projects.ecommerce.Entity.DTO.HomePageDealsDTO;
-import com.projects.ecommerce.Entity.DTO.UsersDTO;
 
 @Component
 public class EntityDTOMapper {
@@ -104,9 +100,9 @@ public class EntityDTOMapper {
         dto.setBrand(product.getBrand());
         dto.setProductImageUrl(product.getProductImageUrl());
         if (product.getCategory() != null) {
-            dto.setCategory(product.getCategory().getCategoryName());
+            dto.setCategoryId(product.getCategory().getCategoryId());
         } else {
-            dto.setCategory("Unknown");
+            dto.setCategoryId(null);
         }
 
         return dto;
@@ -123,5 +119,27 @@ public class EntityDTOMapper {
 
     public Page<ProductDTO> toProductDTOPage(Page<Product> productList){
         return productList.map(this::toProductDTO);
+    }
+
+    public ShopByCategoryDTO toShopByCategoryDTO(ShopByCategory shopByCategory){
+        return new ShopByCategoryDTO(
+                shopByCategory.getId(),
+                shopByCategory.getHeading(),
+                shopByCategory.getCategory().getCategoryName(),
+                shopByCategory.getImageUrl()
+        );
+    }
+
+    public List<ShopByCategoryDTO> toShopByCategoryDTOList(List<ShopByCategory> shopByCategoryList){
+        if(shopByCategoryList == null || shopByCategoryList.isEmpty()){
+            return new ArrayList<>();
+        }
+        return shopByCategoryList.stream()
+            .map(this::toShopByCategoryDTO)
+            .toList();
+    }
+
+    public Page<ShopByCategoryDTO> toShopByCategoryDTOPage(Page<ShopByCategory> shopByCategoryList){
+        return shopByCategoryList.map(this::toShopByCategoryDTO);
     }
 }

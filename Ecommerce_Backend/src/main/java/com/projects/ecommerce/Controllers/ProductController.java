@@ -39,14 +39,14 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product")
-    public ResponseEntity<ProductDTO> saveProduct(@RequestBody Product product, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO product, UriComponentsBuilder uriBuilder){
         ProductDTO savedProduct = productService.saveProduct(product);
         var location = uriBuilder.path("/product/{id}").buildAndExpand(savedProduct.getProductId()).toUri();
         return ResponseEntity.created(location).body(savedProduct);
     }
 
     @PutMapping("/admin/product/{id}")
-    public ProductDTO updateProductById(@RequestBody Product product, @PathVariable String id){
+    public ProductDTO updateProductById(@RequestBody ProductDTO product, @PathVariable String id){
         return productService.updateProductById(product, id);
     }
 
