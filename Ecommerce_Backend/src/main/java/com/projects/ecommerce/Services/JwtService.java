@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Getter
 public class JwtService {
-    private String secretKey = "u8Qw1vQw2Jk3lP4m5n6o7p8q9r0s1t2u3v4w5x6y7z8A9B0C1D2E3F4G5H6I7J8";
+    private final String secretKey = "u8Qw1vQw2Jk3lP4m5n6o7p8q9r0s1t2u3v4w5x6y7z8A9B0C1D2E3F4G5H6I7J8";
 
-    public String generateToken(Users user) {
+    public String generateToken(Users user, int expirationInMilliseconds ) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts
                 .builder()
@@ -26,7 +28,7 @@ public class JwtService {
                 .subject(user.getEmail())
                 .issuer("MTR")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 1))
+                .expiration(new Date(System.currentTimeMillis() + expirationInMilliseconds))
                 .and()
                 .signWith(generateKey())
                 .compact();
@@ -37,11 +39,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(decode);
     }
 
-    public String getSecretKey(){
-        return secretKey;
-    }
-
-public String extractUserName(String token) {
+    public String extractUserName(String token) {
     Claims claims = extractAllClaims(token);
     return claims.getSubject();
 }

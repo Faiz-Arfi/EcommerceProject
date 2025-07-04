@@ -1,7 +1,9 @@
 package com.projects.ecommerce.Controllers;
 
 import java.util.List;
+import java.util.Map;
 
+import com.projects.ecommerce.Entity.DTO.LoginResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -81,12 +83,19 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody Users user) {
+    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody Users user) {
         String token = usersService.verifyUser(user);
         if ("failure".equals(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        return ResponseEntity.ok(token);
+        UsersDTO user1 = usersService.getUserDTOByUserName(user.getEmail());
+        String refreshToken = usersService.generateRefreshToken(user);
+        LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .user(user1)
+                .build();
+        return ResponseEntity.ok(loginResponseDTO);
     }
 
     @PostMapping("/moderator/add-admins")
@@ -98,6 +107,24 @@ public class UsersController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
         }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<LoginResponseDTO> refreshToken(@RequestBody Map<String, String> body){
+        String refreshToken = body.get("refreshToken");
+
+        if(refreshToken != null && refreshToken.startsWith("Bearer ")){
+            refreshToken = refreshToken.substring(7);
+        }
+        if(refreshToken == null || !usersService.verifyRefreshToken(refreshToken)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is either invalid or expired");
+        }
+        String newToken = usersService.newJwtToken(refreshToken);
+        LoginResponseDTO response = LoginResponseDTO.builder()
+                .accessToken(newToken)
+                .refreshToken(refreshToken)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
 }

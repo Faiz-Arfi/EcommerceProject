@@ -3,12 +3,17 @@ package com.projects.ecommerce.Services;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.projects.ecommerce.Constants.TokenConstants;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,8 +37,9 @@ public class UsersService {
     private final EntityDTOMapper entityDTOMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
-    public UsersService(UsersRepo usersRepo, CouponsCentralService couponsCentralService, HomePageDealsService homePageDealsService, BCryptPasswordEncoder bCryptPasswordEncoder, EntityDTOMapper entityDTOMapper, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UsersService(UsersRepo usersRepo, CouponsCentralService couponsCentralService, HomePageDealsService homePageDealsService, BCryptPasswordEncoder bCryptPasswordEncoder, EntityDTOMapper entityDTOMapper, AuthenticationManager authenticationManager, JwtService jwtService, UserDetailsService userDetailsService) {
         this.usersRepo = usersRepo;
         this.couponsCentralService = couponsCentralService;
         this.homePageDealsService = homePageDealsService;
@@ -41,6 +47,7 @@ public class UsersService {
         this.entityDTOMapper = entityDTOMapper;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
     public UsersDTO saveUser(Users user, boolean admin) {
@@ -138,8 +145,44 @@ public class UsersService {
         );
 
         if(authenticate.isAuthenticated()){
-            return jwtService.generateToken(user);
+            return jwtService.generateToken(user, 1000 * 60 * TokenConstants.accessTokenValidityMin);
         }
         return "failure";
+    }
+
+    public String generateRefreshToken(Users user) {
+            return jwtService.generateToken(user, 1000 * 60 * TokenConstants.refreshTokenValidityMin);
+    }
+
+    public boolean verifyRefreshToken(String token){
+
+        try{
+            String username = jwtService.extractUserName(token);
+            Users user = usersRepo.findByEmail(username);
+            if(user == null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email: " + username);
+            }
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            return jwtService.isTokenValid(token, userDetails);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    public String newJwtToken(String token){
+        String username = jwtService.extractUserName(token);
+        Users user = usersRepo.findByEmail(username);
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email: " + username);
+        }
+        return jwtService.generateToken(user, 1000 * 60 * TokenConstants.accessTokenValidityMin);
+    }
+
+    public UsersDTO getUserDTOByUserName(@Email(message = "Email already registred") @NotNull(message = "Email cannot be null") String email) {
+        Users user = usersRepo.findByEmail(email);
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email: " + email);
+        }
+        return entityDTOMapper.toUserDTO(user);
     }
 }
