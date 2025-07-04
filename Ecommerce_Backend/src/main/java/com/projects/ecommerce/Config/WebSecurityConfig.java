@@ -69,8 +69,7 @@ public class WebSecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization", 
             "Content-Type", 
-            "X-Requested-With", 
-            "ngrok-skip-browser-warning"  // Add this header
+            "X-Requested-With"
         ));
         
         // When using setAllowedOrigin("*"), allowCredentials must be false

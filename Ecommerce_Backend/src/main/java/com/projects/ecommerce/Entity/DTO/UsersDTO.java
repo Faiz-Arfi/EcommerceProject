@@ -1,5 +1,6 @@
 package com.projects.ecommerce.Entity.DTO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -19,4 +20,8 @@ public class UsersDTO {
     private String email;
     private List<CouponsCentralDTO> couponsCentrals;
     private List<HomePageDealsDTO> homePageDeals;
+    private BigDecimal balance;
+    private String referralCode;
+    private List<String> referredTo;
+    private Boolean canRefer;
 }

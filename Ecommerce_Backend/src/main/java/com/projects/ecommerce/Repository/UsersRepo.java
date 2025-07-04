@@ -12,4 +12,7 @@ public interface UsersRepo extends JpaRepository<Users, String>{
 
     Users findByEmail(String email);
 
+    Users findByReferralCode(String referralCode);
+
+    boolean existsByReferralCode(String code);
 }

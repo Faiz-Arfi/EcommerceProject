@@ -1,7 +1,9 @@
 package com.projects.ecommerce.Services;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.projects.ecommerce.Constants.TokenConstants;
 import jakarta.validation.constraints.Email;
@@ -16,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.projects.ecommerce.DTO.mapper.EntityDTOMapper;
@@ -50,6 +53,7 @@ public class UsersService {
         this.userDetailsService = userDetailsService;
     }
 
+    @Transactional
     public UsersDTO saveUser(Users user, boolean admin) {
         if(usersRepo.existsByEmail(user.getEmail())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user already exists with the same email");
@@ -59,6 +63,9 @@ public class UsersService {
         }
         else if(user.getFirstName() == null || user.getFirstName().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name cannot be null or empty");
+        }
+        else if(user.getFirstName().length() < 3){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name must at least 3 characters long");
         }
         else if(user.getPassword() == null || user.getPassword().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty");
@@ -76,7 +83,36 @@ public class UsersService {
         else{
             user.setRoles(List.of("USER"));
         }
-        return entityDTOMapper.toUserDTO(usersRepo.save(user));
+        user.setBalance(BigDecimal.ZERO);
+        user.setReferredTo(new ArrayList<>());
+        //check if referral code is provided
+        if(user.getReferralCode() != null && !user.getReferralCode().isEmpty()){
+            String referralCode = user.getReferralCode().trim().toUpperCase();
+            //find the user who referred to this user
+            Users refereedBy = usersRepo.findByReferralCode(referralCode);
+            if(refereedBy == null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Referral code not found");
+            }
+            if(!refereedBy.getCanRefer()){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The referral code can't be used anymore");
+            }
+            //increment balance of user and refereedBy
+            user.setBalance(BigDecimal.valueOf(100.00));
+            refereedBy.setBalance(BigDecimal.valueOf(refereedBy.getBalance().doubleValue() + 100.00));
+            user.setReferralCode(null);
+            user.setReferralCode(generateReferralCode(user));
+            user = usersRepo.save(user);
+            refereedBy.getReferredTo().add(user.getUserId());
+            if(refereedBy.getReferredTo().size() == 2){
+                refereedBy.setCanRefer(false);
+            }
+            usersRepo.save(refereedBy);
+        }
+        else{
+            user.setReferralCode(generateReferralCode(user));
+            usersRepo.save(user);
+        }
+        return entityDTOMapper.toUserDTO(user);
     }
 
     public Page<UsersDTO> getAllUsersDTO(Pageable p) {
@@ -154,13 +190,16 @@ public class UsersService {
             return jwtService.generateToken(user, 1000 * 60 * TokenConstants.refreshTokenValidityMin);
     }
 
-    public boolean verifyRefreshToken(String token){
+    public boolean verifyRefreshToken(String token, String userId){
 
         try{
             String username = jwtService.extractUserName(token);
             Users user = usersRepo.findByEmail(username);
             if(user == null){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email: " + username);
+            }
+            else if(!user.getUserId().equalsIgnoreCase(userId)){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Security Breach");
             }
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             return jwtService.isTokenValid(token, userDetails);
@@ -178,11 +217,26 @@ public class UsersService {
         return jwtService.generateToken(user, 1000 * 60 * TokenConstants.accessTokenValidityMin);
     }
 
-    public UsersDTO getUserDTOByUserName(@Email(message = "Email already registred") @NotNull(message = "Email cannot be null") String email) {
+    public UsersDTO getUserDTOByUserName(@Email(message = "Email already registered") @NotNull(message = "Email cannot be null") String email) {
         Users user = usersRepo.findByEmail(email);
         if(user == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with email: " + email);
         }
         return entityDTOMapper.toUserDTO(user);
+    }
+
+    public boolean existByReferralCode(String code) {
+        return usersRepo.existsByReferralCode(code);
+    }
+
+    public String generateReferralCode(Users user){
+        String baseCode = user.getFirstName().substring(0, 3).toUpperCase();
+        String code;
+        do{
+            int randomNumber = new Random().nextInt(100000);
+            code = baseCode + "-" + String.format("%05d", randomNumber);
+        }while(existByReferralCode(code));
+
+        return code;
     }
 }

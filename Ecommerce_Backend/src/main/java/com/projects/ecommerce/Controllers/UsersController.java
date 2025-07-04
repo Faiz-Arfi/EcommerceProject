@@ -112,17 +112,22 @@ public class UsersController {
     @PostMapping("/refresh-token")
     public ResponseEntity<LoginResponseDTO> refreshToken(@RequestBody Map<String, String> body){
         String refreshToken = body.get("refreshToken");
+        String userId = body.get("userId");
 
         if(refreshToken != null && refreshToken.startsWith("Bearer ")){
             refreshToken = refreshToken.substring(7);
         }
-        if(refreshToken == null || !usersService.verifyRefreshToken(refreshToken)){
+        if(refreshToken == null || !usersService.verifyRefreshToken(refreshToken, userId)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is either invalid or expired");
+        }
+        if(userId == null || userId.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID is either invalid or empty");
         }
         String newToken = usersService.newJwtToken(refreshToken);
         LoginResponseDTO response = LoginResponseDTO.builder()
                 .accessToken(newToken)
                 .refreshToken(refreshToken)
+                .user(usersService.getUserDTOById(userId))
                 .build();
         return ResponseEntity.ok(response);
     }

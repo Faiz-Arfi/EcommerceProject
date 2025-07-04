@@ -21,6 +21,10 @@ public class EntityDTOMapper {
         dto.setEmail(user.getEmail());
         dto.setHomePageDeals(toHomePageDealsDTOList(user.getHomePageDeals()));
         dto.setCouponsCentrals(toCouponsCentralDTOList(user.getCouponsCentrals()));
+        dto.setBalance(user.getBalance());
+        dto.setReferralCode(user.getReferralCode());
+        dto.setReferredTo(user.getReferredTo());
+        dto.setCanRefer(user.getCanRefer());
         return dto;
     }
 
