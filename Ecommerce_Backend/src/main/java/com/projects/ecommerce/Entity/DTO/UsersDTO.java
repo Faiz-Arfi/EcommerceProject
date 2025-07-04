@@ -17,7 +17,6 @@ public class UsersDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
     private List<CouponsCentralDTO> couponsCentrals;
     private List<HomePageDealsDTO> homePageDeals;
 }

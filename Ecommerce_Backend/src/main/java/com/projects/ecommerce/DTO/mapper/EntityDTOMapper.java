@@ -19,18 +19,9 @@ public class EntityDTOMapper {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
         dto.setHomePageDeals(toHomePageDealsDTOList(user.getHomePageDeals()));
         dto.setCouponsCentrals(toCouponsCentralDTOList(user.getCouponsCentrals()));
         return dto;
-    }
-    public List<UsersDTO> toUsersDTOList(List<Users> userList){
-        if(userList == null || userList.isEmpty()){
-            return new ArrayList<>();
-        }
-        return userList.stream()
-            .map(this::toUserDTO)
-            .toList();
     }
 
     public Page<UsersDTO> toUsersDTOPage(Page<Users> userList){
@@ -108,15 +99,6 @@ public class EntityDTOMapper {
         return dto;
     }
 
-    public List<ProductDTO> toProductDTOList(List<Product> productList){
-        if(productList == null || productList.isEmpty()){
-            return new ArrayList<>();
-        }
-        return productList.stream()
-            .map(this::toProductDTO)
-            .toList();
-    }
-
     public Page<ProductDTO> toProductDTOPage(Page<Product> productList){
         return productList.map(this::toProductDTO);
     }
@@ -128,15 +110,6 @@ public class EntityDTOMapper {
                 shopByCategory.getCategory().getCategoryName(),
                 shopByCategory.getImageUrl()
         );
-    }
-
-    public List<ShopByCategoryDTO> toShopByCategoryDTOList(List<ShopByCategory> shopByCategoryList){
-        if(shopByCategoryList == null || shopByCategoryList.isEmpty()){
-            return new ArrayList<>();
-        }
-        return shopByCategoryList.stream()
-            .map(this::toShopByCategoryDTO)
-            .toList();
     }
 
     public Page<ShopByCategoryDTO> toShopByCategoryDTOPage(Page<ShopByCategory> shopByCategoryList){
