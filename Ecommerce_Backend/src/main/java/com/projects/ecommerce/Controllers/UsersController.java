@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,9 +44,14 @@ public class UsersController {
         }
     }
 
-    @GetMapping("/users")
+    @GetMapping("/admin/get-all-users")
     public Page<UsersDTO> getAllUsers(Pageable p){
         return usersService.getAllUsersDTO(p);
+    }
+
+    @GetMapping("/users")
+    public UsersDTO getUserDetails(Authentication authentication){
+        return usersService.getUserDTOByUserName(authentication.getName());
     }
 
     @GetMapping("/users/{userId}")
@@ -55,31 +61,31 @@ public class UsersController {
     }
 
     @PostMapping("/users/coupons")
-    public ResponseEntity<UsersDTO> setUserCoupon(
-            @RequestParam String userId,
+    public ResponseEntity<UsersDTO> setUserCoupon(Authentication authentication,
             @RequestParam String couponId,
             UriComponentsBuilder uriBuilder) {
-        var location = uriBuilder.path("/users/coupons/{userId}").buildAndExpand(userId).toUri();
+        String userId = usersService.getUserDTOByUserName(authentication.getName()).getUserId();
+        var location = uriBuilder.path("/users/coupons}").buildAndExpand(userId).toUri();
         return ResponseEntity.created(location).body(usersService.setCouponsForUserId(userId, couponId));
     }
 
     @PostMapping("/users/deals")
-        public ResponseEntity<UsersDTO> setUserDeals(
-            @RequestParam String userId,
+        public ResponseEntity<UsersDTO> setUserDeals(Authentication authentication,
             @RequestParam String dealId,
             UriComponentsBuilder uriBuilder) {
+        String userId = usersService.getUserDTOByUserName(authentication.getName()).getUserId();
         var location = uriBuilder.path("/users/deals/{userId}").buildAndExpand(userId).toUri();
         return ResponseEntity.created(location).body(usersService.setDealsForUserId(userId, dealId));
     }
 
-    @GetMapping("/users/deals/{userId}")
-    public List<HomePageDealsDTO> getDealsByUserId(@PathVariable String userId) {
-        return usersService.getDealsByUserId(userId);
+    @GetMapping("/users/deals")
+    public Page<HomePageDealsDTO> getDealsByUserId(Authentication authentication, Pageable p) {
+        return usersService.getDealsByUserName(authentication.getName(), p);
     }
 
-    @GetMapping("/users/coupons/{userId}")
-    public List<CouponsCentralDTO> getCouponsByUserId(@PathVariable String userId){
-        return usersService.getCouponsByUserId(userId);
+    @GetMapping("/users/coupons")
+    public Page<CouponsCentralDTO> getCouponsByUserId(Authentication authentication, Pageable p){
+        return usersService.getCouponsByUserName(authentication.getName(), p);
     }
 
     @PostMapping("/login")

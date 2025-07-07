@@ -9,6 +9,7 @@ import com.projects.ecommerce.Constants.TokenConstants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -124,6 +125,14 @@ public class UsersService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
     }
 
+    public Users getUserByUserName(String userName) {
+        Users user = usersRepo.findByEmail(userName);
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email: " + userName);
+        }
+        return user;
+    }
+
     public UsersDTO getUserDTOById(String userId) {
         Users user = getUserById(userId);
         return entityDTOMapper.toUserDTO(user);
@@ -163,14 +172,22 @@ public class UsersService {
         return entityDTOMapper.toUserDTO(usersRepo.save(user));  
     }
 
-    public List<HomePageDealsDTO> getDealsByUserId(String userId) {
-        Users user = getUserById(userId);
-        return entityDTOMapper.toHomePageDealsDTOList(user.getHomePageDeals());
+    public Page<HomePageDealsDTO> getDealsByUserName(String userName, Pageable p) {
+        Users user = getUserByUserName(userName);
+        List<HomePageDeals> deals = user.getHomePageDeals();
+        int start = (int) p.getOffset();
+        int end = Math.min((start + p.getPageSize()), deals.size());
+        List<HomePageDealsDTO> dtoList = entityDTOMapper.toHomePageDealsDTOList(deals.subList(start, end));
+        return new PageImpl<>(dtoList, p, deals.size());
     }
 
-    public List<CouponsCentralDTO> getCouponsByUserId(String userId){
-        Users user = getUserById(userId);
-        return entityDTOMapper.toCouponsCentralDTOList(user.getCouponsCentrals());
+    public Page<CouponsCentralDTO> getCouponsByUserName(String userName, Pageable p){
+        Users user = getUserByUserName(userName);
+        List<CouponsCentral> coupons = user.getCouponsCentrals();
+        int start = (int) p.getOffset();
+        int end = Math.min((start + p.getPageSize()), coupons.size());
+        List<CouponsCentralDTO> dtoList = entityDTOMapper.toCouponsCentralDTOList(coupons.subList(start, end));
+        return new PageImpl<>(dtoList, p, coupons.size());
     }
 
     public String verifyUser(Users user) {
